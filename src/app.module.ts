@@ -17,6 +17,7 @@ import { ConfigModule } from '@nestjs/config';
       ConfigModule.forRoot({
       isGlobal: true}),
 
+
      TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
@@ -39,5 +40,14 @@ import { ConfigModule } from '@nestjs/config';
   providers: [AppService],
 })
 
-export class AppModule {}
+export class AppModule {
+  constructor(){
+    console.log('---- VERIFICACION DE CONEXION------')
+    console.log ('DB host', process.env.DB_HOST)
+    console.log ('DB port', process.env.DB_PORT)
+    console.log ('DB username', process.env.DB_USERNAME)
+    console.log ('DB password', process.env.DB_PASSWORD)
+    console.log ('DB name', process.env.DB_NAME)
+  }
+}
 
