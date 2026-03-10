@@ -44,14 +44,5 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   providers: [AppService],
 })
 
-export class AppModule {
-  constructor(){
-    console.log('---- VERIFICACION DE CONEXION------')
-    console.log ('DB host', process.env.DB_HOST)
-    console.log ('DB port', process.env.DB_PORT)
-    console.log ('DB username', process.env.DB_USERNAME)
-    console.log ('DB password', process.env.DB_PASSWORD)
-    console.log ('DB name', process.env.DB_NAME)
-  }
-}
+export class AppModule {}
 
