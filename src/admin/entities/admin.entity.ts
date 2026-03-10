@@ -8,6 +8,6 @@ export class Admin {
     @Column()
     email:string;
 
-    @Column()
+    @Column({ type: 'varchar', length: 255 })
     contrasena:string;
 }

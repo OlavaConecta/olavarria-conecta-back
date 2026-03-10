@@ -30,7 +30,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       database: process.env.MYSQLDATABASE || 'olavarriaconecta',
       autoLoadEntities: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
+      synchronize: true,
     }),
   }),
     TiendasModule,
