@@ -7,7 +7,11 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create <NestExpressApplication>(AppModule);
   app.enableCors({
-    origin:'olavarriaconecta.com',
+    origin: [
+      'https://olavarriaconecta.com',
+      'https://www.olavarriaconecta.com',
+      'http://localhost:5173' // Para que te siga funcionando en desarrollo
+    ],
     methods:'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials:true,
   }
