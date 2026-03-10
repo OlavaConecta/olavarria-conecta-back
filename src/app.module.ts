@@ -26,7 +26,7 @@ import { ConfigModule } from '@nestjs/config';
       database: process.env.DB_NAME || 'olavarriaconecta',
       autoLoadEntities: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
+      synchronize: true,
     }),
     TiendasModule,
   PlanesModule,
