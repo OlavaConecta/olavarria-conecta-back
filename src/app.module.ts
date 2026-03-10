@@ -8,7 +8,7 @@ import { ProductosModule } from './productos/productos.module';
 import { PlanesModule } from './planes/planes.module';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 
 @Module({
@@ -18,7 +18,10 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true}),
 
 
-     TypeOrmModule.forRoot({
+     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
       type: 'mysql',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT || '3306', 10),
@@ -29,6 +32,7 @@ import { ConfigModule } from '@nestjs/config';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
+  }),
     TiendasModule,
   PlanesModule,
   ProductosModule,
