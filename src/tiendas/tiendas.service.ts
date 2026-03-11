@@ -25,7 +25,7 @@ export class TiendasService {
 
   async findAll(): Promise <Tienda[]> {
     return this.tiendaRepository.find({
-      relations: ['plan', 'productos']
+      relations: ['plan', 'productos','categorias']
     });
   }
 
