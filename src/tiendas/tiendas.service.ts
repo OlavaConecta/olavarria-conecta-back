@@ -37,7 +37,7 @@ export class TiendasService {
    return tienda;
   }
 
-async update(id: number, updateTiendaDto: UpdateTiendaDto) {
+async update(id: number, updateTiendaDto: UpdateTiendaDto,imagenUrl?:string) {
   
   const tienda = await this.tiendaRepository.findOne({ where: { id } });
   
@@ -50,6 +50,10 @@ async update(id: number, updateTiendaDto: UpdateTiendaDto) {
 
   // 3. ACTUALIZAMOS DATOS SIMPLES (Nombre, WhatsApp, Dirección, Horario, Imagen, Activo)
   Object.assign(tienda, datosSimples);
+
+  if(imagenUrl){
+    tienda.imagen = imagenUrl;
+  }
 
   // 4. FORZAMOS LA CATEGORÍA (El texto: "Mascotas" -> "Restaurant")
   // Como en la Entity es un @Column() simple, lo asignamos directo
