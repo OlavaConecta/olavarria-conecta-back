@@ -10,23 +10,15 @@ export class ProductosController {
   constructor(private readonly productosService: ProductosService, private readonly cloudinaryService: CloudinaryService) {}
 
 @Post()
-  // Usamos el interceptor para capturar el archivo 'file'
-  @UseInterceptors(FileInterceptor('imagen_archivo'))
-  async create(
-    @Body() createProductoDto: CreateProductoDto, 
-    @UploadedFile() file: Express.Multer.File // El archivo físico
-  ) {
-    let imageUrl = '';
-
-    if (file) {
-      // Reutilizamos tu servicio de Cloudinary
-      const result = await this.cloudinaryService.uploadFile(file);
-      imageUrl = result; // URL de la imagen optimizada
-    }
-
-    // Pasamos los datos del producto y la URL de la imagen al servicio
-    return await this.productosService.create(createProductoDto, imageUrl);
-  }
+@UseInterceptors(FileInterceptor('imagen_archivo'))
+async create(
+  @Body() createProductoDto: CreateProductoDto, 
+  @UploadedFile() file: Express.Multer.File 
+) {
+  // 1. ELIMINAMOS la lógica de Cloudinary de acá.
+  // 2. Le pasamos el 'file' directamente al servicio.
+  return await this.productosService.create(createProductoDto, file);
+}
 
   @Get()
   findAll(@Query('tiendaId')tiendaId:string) {
@@ -42,8 +34,8 @@ export class ProductosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto) {
-    return this.productosService.update(+id, updateProductoDto);
+  update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto, @UploadedFile() file: Express.Multer.File) {
+    return this.productosService.update(+id, updateProductoDto, file);
   }
 
   @Delete(':id')
