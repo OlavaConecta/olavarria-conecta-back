@@ -8,6 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TiendasService {
+  cloudinaryService: any;
+  save(datosCompletos: { imagenUrl: any; nombre: string; whatsapp: string; direccion: string; horario: string; imagen: string; activo: boolean; planId: number; categoria: string; }) {
+    throw new Error('Method not implemented.');
+  }
 
   constructor(
     @InjectRepository(Tienda) private readonly tiendaRepository: Repository<Tienda>
@@ -37,38 +41,37 @@ export class TiendasService {
    return tienda;
   }
 
-async update(id: number, updateTiendaDto: UpdateTiendaDto,imagenUrl?:string) {
-  
+async update(id: number, updateTiendaDto: UpdateTiendaDto, imagenUrl?: string) {
   const tienda = await this.tiendaRepository.findOne({ where: { id } });
-  
-  if (!tienda) {
-    throw new NotFoundException('Tienda no encontrada');
-  }
+  if (!tienda) throw new NotFoundException('Tienda no encontrada');
 
-  // 2. DESESTRUCTURAMOS: Separamos los campos especiales de los simples
   const { planId, categoria, ...datosSimples } = updateTiendaDto;
-
-  // 3. ACTUALIZAMOS DATOS SIMPLES (Nombre, WhatsApp, Dirección, Horario, Imagen, Activo)
   Object.assign(tienda, datosSimples);
 
-  if(imagenUrl){
+  // --- LÓGICA DE BORRADO OPCIÓN A ---
+  if (imagenUrl && tienda.imagen) {
+    try {
+      // 1. Extraemos el public_id de la URL vieja
+      // Ejemplo de URL: https://res.cloudinary.com/demo/image/upload/v12345/olavarria_conecta/nombre_imagen.webp
+      const urlParts = tienda.imagen.split('/');
+      const folder = urlParts[urlParts.length - 2]; // 'olavarria_conecta'
+      const fileNameWithExtension = urlParts[urlParts.length - 1]; // 'nombre_imagen.webp'
+      const publicId = `${folder}/${fileNameWithExtension.split('.')[0]}`; // 'olavarria_conecta/nombre_imagen'
+
+      // 2. Mandamos a borrar a la nube
+      await this.cloudinaryService.deleteFile(publicId);
+      console.log('Imagen anterior borrada de Cloudinary:', publicId);
+    } catch (error) {
+      // Usamos un console.warn para que si falla el borrado, la app siga funcionando igual
+      console.warn('No se pudo borrar la imagen vieja, pero procedemos con el update:', error);
+    }
+  }
+
+  // 3. Asignamos la nueva imagen
+  if (imagenUrl) {
     tienda.imagen = imagenUrl;
   }
 
-  // 4. FORZAMOS LA CATEGORÍA (El texto: "Mascotas" -> "Restaurant")
-  // Como en la Entity es un @Column() simple, lo asignamos directo
-  if (categoria !== undefined) {
-    tienda.categoria = categoria;
-  }
-
-  // 5. FORZAMOS EL PLAN (La relación ManyToOne)
-  // Usamos el planId que viene del DTO para vincular el objeto
-  if (planId !== undefined) {
-    tienda.plan = { id: Number(planId) } as any;
-  }
-
-  // 6. GUARDAMOS TODO
-  // save() detectará que 'categoria' cambió y disparará el UPDATE en la tabla
   return await this.tiendaRepository.save(tienda);
 }
 

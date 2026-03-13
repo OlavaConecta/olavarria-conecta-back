@@ -12,21 +12,23 @@ export class TiendasController {
 
   @Post()
   @UseInterceptors(FileInterceptor('imagen_archivo'))
+ 
   async create(
-    @Body() createTiendaDto: CreateTiendaDto,
-    @UploadedFile() file: Express.Multer.File // Capturamos el archivo aquí
-  ) {
-    let imageUrl = '';
+  @UploadedFile() file: Express.Multer.File,
+  @Body() createDto: CreateTiendaDto
+) {
+  // 1. Subir solo la imagen a Cloudinary
+  const imageUrl = await this.cloudinaryService.uploadImage(file);
 
-    // Si el usuario envió una imagen desde su PC
-    if (file) {
-      const result = await this.cloudinaryService.uploadFile(file);
-      imageUrl = result.secure_url; // Aquí ya tenés la URL .webp de Cloudinary
-    }
+  // 2. Combinar la URL con el resto de los datos para la DB
+  const datosCompletos = {
+    ...createDto,
+    imagenUrl: imageUrl, // Solo guardamos el string
+  };
 
-    // Le pasamos al servicio el DTO y la URL de la imagen
-    return this.tiendasService.create(createTiendaDto, imageUrl);
-  }
+  // 3. Guardar en MySQL a través de tu servicio de TypeORM/Sequelize
+  return this.tiendasService.save(datosCompletos);
+}
   @Get()
   findAll() {
     return this.tiendasService.findAll();
@@ -43,16 +45,13 @@ export class TiendasController {
     @Body() updateTiendaDto: UpdateTiendaDto,
     @UploadedFile() file: Express.Multer.File // 2. Capturamos el archivo si viene
   ) :Promise <Tienda>{
-    console.log('-----NUEVA SECCION PATCH-----');
-    console.log('ID:', id);
-    console.log('Body:', updateTiendaDto);
-    console.log('File:', file);
+ 
     let imageUrl : string | undefined = undefined; // Usamos undefined para que el service sepa si hubo cambio o no
 
     // 3. Si el usuario subió una imagen nueva para editar
     if (file) {
       const result = await this.cloudinaryService.uploadFile(file);
-      imageUrl = result.secure_url;
+      imageUrl = result;
     }
 
     // 4. Ahora le pasamos el tercer parámetro al Service

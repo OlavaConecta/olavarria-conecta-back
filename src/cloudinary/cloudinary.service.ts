@@ -1,37 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import * as streamifier from 'streamifier';
 
-const streamifier = require('streamifier');
-
 @Injectable()
 export class CloudinaryService {
+  uploadImage(file: Express.Multer.File) {
+    throw new Error('Method not implemented.');
+  }
   constructor(private configService: ConfigService) {
-    // Configura tus credenciales (Usá @nestjs/config si lo tenés instalado)
     cloudinary.config({
-      cloud_name: this.configService.get('CLOUDINARU_CLOUD_NAME') || 'dimxduwpw',
-      api_key: this.configService.get('CLOUDINARU_API_KEY') || '331352586624732',
-      api_secret: this.configService.get('CLOUDINARU_API_SECRET') || 'ntj5_rDuta78UGa21G_Twd90hbs',
+      cloud_name: this.configService.get('CLOUDINARY_CLOUD_NAME') || 'dimxduwpw',
+      api_key: this.configService.get('CLOUDINARY_API_KEY') || '331352586624732',
+      api_secret: this.configService.get('CLOUDINARY_API_SECRET') || 'ntj5_rDuta78UGa21G_Twd90hbs',
     });
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<any> {
+  async uploadFile(file: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
       const upload = cloudinary.uploader.upload_stream(
         {
-          folder: 'olavarria_conecta', // Tu carpeta en la nube
-          format: 'webp',              // Magia: conversión automática
+          folder: 'olavarria_conecta',
+          format: 'webp',
           transformation: [{ quality: 'auto' }]
         },
-        (error, result) => {
+        (error: UploadApiErrorResponse, result: UploadApiResponse) => {
           if (error) return reject(error);
-          resolve(result);
+          // Retornamos solo la URL segura para guardarla en MySQL
+          resolve(result.secure_url);
         },
       );
 
-      // Esto convierte el buffer de Multer en un stream para Cloudinary
+      // Usamos el buffer que viene de Multer
       streamifier.createReadStream(file.buffer).pipe(upload);
     });
   }
+ async deleteFile(publicId: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(publicId, (error, result) => {
+      if (error) return reject(error);
+      resolve(result);
+    });
+  });
+}
 }
