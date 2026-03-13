@@ -10,8 +10,6 @@ export class TiendasController {
   constructor(private readonly tiendasService: TiendasService, private readonly cloudinaryService: CloudinaryService) {}
 
 @Post()
-  // El Interceptor "abre la puerta" para recibir archivos. 
-  // 'file' es el nombre del campo que enviarás desde el frontend (FormData).
   @UseInterceptors(FileInterceptor('imagen_archivo')) 
   async create(
     @Body() createTiendaDto: CreateTiendaDto, 
@@ -28,7 +26,10 @@ export class TiendasController {
     // Le pasamos al servicio el DTO y la URL de la imagen
     return this.tiendasService.create(createTiendaDto, imageUrl);
   }
-
+   @Get()
+  findAll() {
+    return this.tiendasService.findAll();
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tiendasService.findOne(+id);
