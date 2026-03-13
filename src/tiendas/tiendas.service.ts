@@ -13,10 +13,10 @@ export class TiendasService {
     @InjectRepository(Tienda) private readonly tiendaRepository: Repository<Tienda>
   ){}
 
-  async create(createTiendaDto: CreateTiendaDto): Promise<Tienda> {
+  async create(createTiendaDto: CreateTiendaDto, imagenUrl: string): Promise<Tienda> {
     try {
       const {planId,...datosTienda} = createTiendaDto;
-      const tienda = this.tiendaRepository.create({...datosTienda,plan:{id:planId}});
+      const tienda = this.tiendaRepository.create({...datosTienda,plan:{id:planId},imagen:imagenUrl});
       return await this.tiendaRepository.save(tienda);
     } catch (error) {
       throw new Error(`Error creating tienda: ${error.message}`);

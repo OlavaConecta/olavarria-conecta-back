@@ -6,10 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Categoria } from 'src/categorias/entities/categoria.entity';
 import { Producto } from 'src/productos/entities/producto.entity';
 import { Planes } from 'src/planes/entities/plane.entity';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Tienda,Categoria, Producto, Planes]),
+    TypeOrmModule.forFeature([Tienda,Categoria, Producto, Planes, CloudinaryModule]),
     // forwardRef(() => ProductosModule),
   ],
   controllers: [TiendasController],

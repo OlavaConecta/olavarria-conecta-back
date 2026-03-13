@@ -1,20 +1,32 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors,UploadedFile } from '@nestjs/common';
 import { TiendasService } from './tiendas.service';
 import { CreateTiendaDto } from './dto/create-tienda.dto';
 import { UpdateTiendaDto } from './dto/update-tienda.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('tiendas')
 export class TiendasController {
-  constructor(private readonly tiendasService: TiendasService) {}
+  constructor(private readonly tiendasService: TiendasService, private readonly cloudinaryService: CloudinaryService) {}
 
-  @Post()
-  create(@Body() createTiendaDto: CreateTiendaDto) {
-    return this.tiendasService.create(createTiendaDto);
-  }
+@Post()
+  // El Interceptor "abre la puerta" para recibir archivos. 
+  // 'file' es el nombre del campo que enviarás desde el frontend (FormData).
+  @UseInterceptors(FileInterceptor('imagen_archivo')) 
+  async create(
+    @Body() createTiendaDto: CreateTiendaDto, 
+    @UploadedFile() file: Express.Multer.File // Capturamos el archivo aquí
+  ) {
+    let imageUrl = '';
 
-  @Get()
-  findAll() {
-    return this.tiendasService.findAll();
+    // Si el usuario envió una imagen desde su PC
+    if (file) {
+      const result = await this.cloudinaryService.uploadFile(file);
+      imageUrl = result.secure_url; // Aquí ya tenés la URL .webp de Cloudinary
+    }
+
+    // Le pasamos al servicio el DTO y la URL de la imagen
+    return this.tiendasService.create(createTiendaDto, imageUrl);
   }
 
   @Get(':id')

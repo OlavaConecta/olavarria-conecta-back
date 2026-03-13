@@ -29,6 +29,8 @@
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "cloudinary": "^2.9.0",
+    "multer": "^2.1.1",
     "mysql2": "^3.18.2",
     "pg": "^8.19.0",
     "reflect-metadata": "^0.2.2",

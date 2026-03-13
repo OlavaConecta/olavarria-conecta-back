@@ -11,10 +11,10 @@ export class ProductosService {
     @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>
   ) { }
-  async create(createProductoDto: CreateProductoDto): Promise<Producto> {
+  async create(createProductoDto: CreateProductoDto,imageUrl:string): Promise<Producto> {
     try {
       const {tiendaId,...datosProducto} = createProductoDto;
-      const nuevoProducto = this.productoRepository.create({...datosProducto,tienda:{id:tiendaId}});
+      const nuevoProducto = this.productoRepository.create({...datosProducto,tienda:{id:tiendaId},imagen:imageUrl});
       return await this.productoRepository.save(nuevoProducto);
     } catch (error) {
       console.error('error al crear producto', error);

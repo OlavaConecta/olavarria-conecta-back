@@ -9,6 +9,7 @@ import { PlanesModule } from './planes/planes.module';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 
 @Module({
@@ -39,6 +40,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   CategoriasModule,
   AdminModule,
   AuthModule,
+  CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

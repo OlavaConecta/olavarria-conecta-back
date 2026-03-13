@@ -1,15 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query,UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('productos')
 export class ProductosController {
-  constructor(private readonly productosService: ProductosService) {}
+  constructor(private readonly productosService: ProductosService, private readonly cloudinaryService: CloudinaryService) {}
 
-  @Post()
-  create(@Body() createProductoDto: CreateProductoDto) {
-    return this.productosService.create(createProductoDto);
+@Post()
+  // Usamos el interceptor para capturar el archivo 'file'
+  @UseInterceptors(FileInterceptor('imagen_archivo'))
+  async create(
+    @Body() createProductoDto: CreateProductoDto, 
+    @UploadedFile() file: Express.Multer.File // El archivo físico
+  ) {
+    let imageUrl = '';
+
+    if (file) {
+      // Reutilizamos tu servicio de Cloudinary
+      const result = await this.cloudinaryService.uploadFile(file);
+      imageUrl = result.secure_url; // URL de la imagen optimizada
+    }
+
+    // Pasamos los datos del producto y la URL de la imagen al servicio
+    return await this.productosService.create(createProductoDto, imageUrl);
   }
 
   @Get()
