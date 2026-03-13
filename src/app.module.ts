@@ -32,6 +32,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       autoLoadEntities: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
+      logging:true,
     }),
   }),
     TiendasModule,
