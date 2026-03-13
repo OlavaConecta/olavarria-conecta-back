@@ -10,7 +10,8 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Tienda,Categoria, Producto, Planes, CloudinaryModule]),
+    TypeOrmModule.forFeature([Tienda,Categoria, Producto, Planes]),
+    CloudinaryModule,
     // forwardRef(() => ProductosModule),
   ],
   controllers: [TiendasController],

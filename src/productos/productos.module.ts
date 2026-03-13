@@ -8,7 +8,8 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Producto,Tienda,CloudinaryModule])
+    TypeOrmModule.forFeature([Producto,Tienda]),
+    CloudinaryModule,
   ],
   controllers: [ProductosController],
   providers: [ProductosService],
