@@ -43,6 +43,10 @@ export class TiendasController {
     @Body() updateTiendaDto: UpdateTiendaDto,
     @UploadedFile() file: Express.Multer.File // 2. Capturamos el archivo si viene
   ) :Promise <Tienda>{
+    console.log('-----NUEVA SECCION PATCH-----');
+    console.log('ID:', id);
+    console.log('Body:', updateTiendaDto);
+    console.log('File:', file);
     let imageUrl : string | undefined = undefined; // Usamos undefined para que el service sepa si hubo cambio o no
 
     // 3. Si el usuario subió una imagen nueva para editar
