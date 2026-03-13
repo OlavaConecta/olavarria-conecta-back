@@ -21,7 +21,7 @@ export class ProductosController {
     if (file) {
       // Reutilizamos tu servicio de Cloudinary
       const result = await this.cloudinaryService.uploadFile(file);
-      imageUrl = result.secure_url; // URL de la imagen optimizada
+      imageUrl = result; // URL de la imagen optimizada
     }
 
     // Pasamos los datos del producto y la URL de la imagen al servicio
