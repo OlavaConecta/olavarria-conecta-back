@@ -22,3 +22,5 @@ app.use(json({ limit: '50mb' }));
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
+//fix para que se suba todo
