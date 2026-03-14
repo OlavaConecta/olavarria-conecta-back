@@ -4,13 +4,15 @@ import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './entities/producto.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class ProductosService {
-  cloudinaryService: any;
+
   constructor(
     @InjectRepository(Producto)
-    private readonly productoRepository: Repository<Producto>
+    private readonly productoRepository: Repository<Producto>,
+    private readonly cloudinaryService: CloudinaryService
   ) { }
   async create(createProductoDto: any, file: Express.Multer.File): Promise<Producto> {
   try {
@@ -86,7 +88,7 @@ export class ProductosService {
       }
 
       // Subir la nueva imagen
-      const newImageUrl = await this.cloudinaryService.uploadFile(file, 'olavarria_conecta/productos');
+      const newImageUrl = await this.cloudinaryService.uploadFile(file);
       producto.imagen = newImageUrl;
     }
 
