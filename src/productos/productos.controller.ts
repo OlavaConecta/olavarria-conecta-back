@@ -10,13 +10,11 @@ export class ProductosController {
   constructor(private readonly productosService: ProductosService, private readonly cloudinaryService: CloudinaryService) {}
 
 @Post()
-@UseInterceptors(FileInterceptor('imagen_archivo'))
+@UseInterceptors(FileInterceptor('imagen_archivo')) 
 async create(
   @UploadedFile() file: Express.Multer.File,
   @Body() createProductoDto: CreateProductoDto, 
 ) {
-  // Siguiendo el proceso de tiendas:
-  // Si no hay archivo, pasamos null, si hay, se lo mandamos al servicio
   return await this.productosService.create(createProductoDto, file);
 }
 

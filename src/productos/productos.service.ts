@@ -12,28 +12,26 @@ export class ProductosService {
     @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>
   ) { }
-  async create(createProductoDto: any, file: Express.Multer.File) {
+  async create(createProductoDto: any, file: Express.Multer.File): Promise<Producto> {
   try {
-    let urlImagen = '';
+    let urlImagen = "";
 
-    // PROCESO IDENTICO AL DE TIENDAS:
-    // Primero obtenemos la URL de Cloudinary
+    // 1. Llamada exacta a como está definido en tu CloudinaryService
     if (file) {
-      urlImagen = await this.cloudinaryService.uploadFile(file, 'olavarria_conecta/productos');
+      // SOLO pasamos el 'file', sin el segundo argumento de la carpeta
+      urlImagen = await this.cloudinaryService.uploadFile(file); 
     }
 
-    // Ahora creamos el producto asegurándonos de que 'imagen' reciba esa urlImagen
+    // 2. Creación del objeto Producto
     const nuevoProducto = this.productoRepository.create({
       titulo: createProductoDto.titulo,
       descripcion: createProductoDto.descripcion,
       precio: Number(createProductoDto.precio),
-      // Vinculamos la URL que acabamos de generar
-      imagen: urlImagen, 
-      // Vinculamos la tienda
+      imagen: urlImagen, // Aquí debería llegar el secure_url de Cloudinary
       tienda: { id: Number(createProductoDto.tiendaId) }
     });
 
-    // Guardamos y retornamos
+    // 3. Guardado final
     return await this.productoRepository.save(nuevoProducto);
 
   } catch (error) {
