@@ -14,29 +14,30 @@ export class ProductosService {
   ) { }
   async create(createProductoDto: any, file: Express.Multer.File): Promise<Producto> {
   try {
-    // 1. Subimos la imagen a Cloudinary
     let imageUrl = '';
+
+    // 1. Subida a Cloudinary
     if (file) {
       imageUrl = await this.cloudinaryService.uploadFile(file, 'olavarria_conecta/productos');
     }
 
-    // 2. Creamos el objeto Producto mapeando solo lo que existe en la Entidad
+    // 2. Mapeo manual para asegurar que coincida con tu @Entity()
+    // Convertimos a número porque desde el Front llega como String
     const nuevoProducto = this.productoRepository.create({
       titulo: createProductoDto.titulo,
       descripcion: createProductoDto.descripcion,
-      // Convertimos a número para que coincida con el tipo 'decimal' de la DB
       precio: Number(createProductoDto.precio),
-      imagen: imageUrl,
-      // Vinculamos con la tienda usando el ID que viene del DTO
-      tienda: { id: Number(createProductoDto.tiendaId) } as any,
+      imagen: imageUrl, // Aquí guardamos la URL final
+      tienda: { id: Number(createProductoDto.tiendaId) } as any
     });
 
-    // 3. Guardamos en MySQL
+    // 3. Guardado en MySQL
     return await this.productoRepository.save(nuevoProducto);
 
   } catch (error) {
-    console.error('Error al crear producto:', error);
-    throw new InternalServerErrorException('No se pudo crear el producto');
+    // Esto te ayudará a ver el error real en los logs de Railway si falla algo más
+    console.error('Error detallado en productos.service:', error);
+    throw new InternalServerErrorException('Error al crear el producto');
   }
 }
 
