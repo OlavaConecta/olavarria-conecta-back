@@ -19,6 +19,7 @@ export class ProductosService {
     // 1. Subida a Cloudinary
     if (file) {
       imageUrl = await this.cloudinaryService.uploadFile(file, 'olavarria_conecta/productos');
+    console.log('2. URL generada por Cloudinary:', imageUrl);
     }
 
     // 2. Mapeo manual para asegurar que coincida con tu @Entity()
@@ -28,7 +29,7 @@ export class ProductosService {
       descripcion: createProductoDto.descripcion,
       precio: Number(createProductoDto.precio),
       imagen: imageUrl, // Aquí guardamos la URL final
-      tienda: { id: Number(createProductoDto.tiendaId) } as any
+      tienda: { id: Number(createProductoDto.tiendaId) }
     });
 
     // 3. Guardado en MySQL
