@@ -15,6 +15,7 @@ async create(
   @UploadedFile() file: Express.Multer.File,
   @Body() createProductoDto: CreateProductoDto, 
 ) {
+  console.log('Archivo recibido en el controlador:', file);
   return await this.productosService.create(createProductoDto, file);
 }
 

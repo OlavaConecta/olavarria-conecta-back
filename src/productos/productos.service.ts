@@ -16,27 +16,27 @@ export class ProductosService {
   try {
     let urlImagen = "";
 
-    // 1. Llamada exacta a como está definido en tu CloudinaryService
     if (file) {
-      // SOLO pasamos el 'file', sin el segundo argumento de la carpeta
-      urlImagen = await this.cloudinaryService.uploadFile(file); 
+      console.log('Subiendo a Cloudinary archivo:', file.originalname);
+      // Forzamos la espera de la URL
+      urlImagen = await this.cloudinaryService.uploadFile(file);
+      console.log('URL recibida de Cloudinary:', urlImagen);
+    } else {
+      console.log('No llegó ningún archivo al servicio');
     }
 
-    // 2. Creación del objeto Producto
     const nuevoProducto = this.productoRepository.create({
       titulo: createProductoDto.titulo,
       descripcion: createProductoDto.descripcion,
       precio: Number(createProductoDto.precio),
-      imagen: urlImagen, // Aquí debería llegar el secure_url de Cloudinary
+      imagen: urlImagen, // Si esto sigue llegando "", el problema es el uploadFile
       tienda: { id: Number(createProductoDto.tiendaId) }
     });
 
-    // 3. Guardado final
     return await this.productoRepository.save(nuevoProducto);
-
   } catch (error) {
-    console.error('Error al crear producto:', error);
-    throw new InternalServerErrorException('Error en la creación del producto');
+    console.error('Error crítico en el servicio:', error);
+    throw new InternalServerErrorException('Error al crear el producto');
   }
 }
 
