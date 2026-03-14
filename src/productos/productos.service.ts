@@ -12,30 +12,33 @@ export class ProductosService {
     @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>
   ) { }
-  async create(createProductoDto: CreateProductoDto,file: Express.Multer.File): Promise<Producto> {
-   try {
-    const { tiendaId, ...datosProducto } = createProductoDto;
+  async create(createProductoDto: any, file: Express.Multer.File): Promise<Producto> {
+  try {
+    // 1. Subimos la imagen a Cloudinary
     let imageUrl = '';
-
-    // 1. Si viene un archivo, lo subimos a Cloudinary desde acá
     if (file) {
       imageUrl = await this.cloudinaryService.uploadFile(file, 'olavarria_conecta/productos');
     }
 
-    // 2. Creamos el producto usando la URL obtenida
+    // 2. Creamos el objeto Producto mapeando solo lo que existe en la Entidad
     const nuevoProducto = this.productoRepository.create({
-      ...datosProducto,
-      tienda: { id: tiendaId },
-      imagen: imageUrl, // Aquí asignamos la URL (o vacío si no hubo archivo)
+      titulo: createProductoDto.titulo,
+      descripcion: createProductoDto.descripcion,
+      // Convertimos a número para que coincida con el tipo 'decimal' de la DB
+      precio: Number(createProductoDto.precio),
+      imagen: imageUrl,
+      // Vinculamos con la tienda usando el ID que viene del DTO
+      tienda: { id: Number(createProductoDto.tiendaId) } as any,
     });
 
+    // 3. Guardamos en MySQL
     return await this.productoRepository.save(nuevoProducto);
-    
+
   } catch (error) {
-      console.error('error al crear producto', error);
-      throw new InternalServerErrorException('Error al crear producto');
-    };
+    console.error('Error al crear producto:', error);
+    throw new InternalServerErrorException('No se pudo crear el producto');
   }
+}
 
   async findAllByTienda(tiendaId: number): Promise<Producto[]> {
   return await this.productoRepository.find({
