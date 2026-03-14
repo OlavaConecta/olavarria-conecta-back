@@ -12,11 +12,11 @@ export class ProductosController {
 @Post()
 @UseInterceptors(FileInterceptor('imagen_archivo'))
 async create(
+  @UploadedFile() file: Express.Multer.File,
   @Body() createProductoDto: CreateProductoDto, 
-  @UploadedFile() file: Express.Multer.File 
 ) {
-  // 1. ELIMINAMOS la lógica de Cloudinary de acá.
-  // 2. Le pasamos el 'file' directamente al servicio.
+  // Siguiendo el proceso de tiendas:
+  // Si no hay archivo, pasamos null, si hay, se lo mandamos al servicio
   return await this.productosService.create(createProductoDto, file);
 }
 

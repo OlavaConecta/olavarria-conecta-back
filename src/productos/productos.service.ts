@@ -12,33 +12,33 @@ export class ProductosService {
     @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>
   ) { }
-  async create(createProductoDto: any, file: Express.Multer.File): Promise<Producto> {
+  async create(createProductoDto: any, file: Express.Multer.File) {
   try {
-    let imageUrl = '';
+    let urlImagen = '';
 
-    // 1. Subir a Cloudinary solo si el archivo existe
+    // PROCESO IDENTICO AL DE TIENDAS:
+    // Primero obtenemos la URL de Cloudinary
     if (file) {
-      imageUrl = await this.cloudinaryService.uploadFile(file, 'olavarria_conecta/productos');
+      urlImagen = await this.cloudinaryService.uploadFile(file, 'olavarria_conecta/productos');
     }
 
-    // 2. Mapeo Manual (OBLIGATORIO para asegurar que la URL se guarde)
+    // Ahora creamos el producto asegurándonos de que 'imagen' reciba esa urlImagen
     const nuevoProducto = this.productoRepository.create({
       titulo: createProductoDto.titulo,
       descripcion: createProductoDto.descripcion,
       precio: Number(createProductoDto.precio),
-      tienda: { id: Number(createProductoDto.tiendaId) } as any,
-      // ACÁ ESTÁ EL CAMBIO: Forzamos que 'imagen' sea la URL de Cloudinary
-      // y si no hay archivo, que quede como un string vacío o lo que prefieras
-      imagen: imageUrl || '' 
+      // Vinculamos la URL que acabamos de generar
+      imagen: urlImagen, 
+      // Vinculamos la tienda
+      tienda: { id: Number(createProductoDto.tiendaId) }
     });
 
-    // 3. Persistencia en la DB
-    const productoGuardado = await this.productoRepository.save(nuevoProducto);
-    
-    return productoGuardado;
+    // Guardamos y retornamos
+    return await this.productoRepository.save(nuevoProducto);
+
   } catch (error) {
-    console.error('Error en el Service de Productos:', error);
-    throw new InternalServerErrorException('No se pudo crear el producto');
+    console.error('Error al crear producto:', error);
+    throw new InternalServerErrorException('Error en la creación del producto');
   }
 }
 
