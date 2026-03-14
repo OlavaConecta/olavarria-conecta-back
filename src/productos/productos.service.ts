@@ -16,29 +16,29 @@ export class ProductosService {
   try {
     let imageUrl = '';
 
-    // 1. Subida a Cloudinary
+    // 1. Subir a Cloudinary solo si el archivo existe
     if (file) {
       imageUrl = await this.cloudinaryService.uploadFile(file, 'olavarria_conecta/productos');
-    console.log('2. URL generada por Cloudinary:', imageUrl);
     }
 
-    // 2. Mapeo manual para asegurar que coincida con tu @Entity()
-    // Convertimos a número porque desde el Front llega como String
+    // 2. Mapeo Manual (OBLIGATORIO para asegurar que la URL se guarde)
     const nuevoProducto = this.productoRepository.create({
       titulo: createProductoDto.titulo,
       descripcion: createProductoDto.descripcion,
       precio: Number(createProductoDto.precio),
-      imagen: imageUrl, // Aquí guardamos la URL final
-      tienda: { id: Number(createProductoDto.tiendaId) }
+      tienda: { id: Number(createProductoDto.tiendaId) } as any,
+      // ACÁ ESTÁ EL CAMBIO: Forzamos que 'imagen' sea la URL de Cloudinary
+      // y si no hay archivo, que quede como un string vacío o lo que prefieras
+      imagen: imageUrl || '' 
     });
 
-    // 3. Guardado en MySQL
-    return await this.productoRepository.save(nuevoProducto);
-
+    // 3. Persistencia en la DB
+    const productoGuardado = await this.productoRepository.save(nuevoProducto);
+    
+    return productoGuardado;
   } catch (error) {
-    // Esto te ayudará a ver el error real en los logs de Railway si falla algo más
-    console.error('Error detallado en productos.service:', error);
-    throw new InternalServerErrorException('Error al crear el producto');
+    console.error('Error en el Service de Productos:', error);
+    throw new InternalServerErrorException('No se pudo crear el producto');
   }
 }
 
