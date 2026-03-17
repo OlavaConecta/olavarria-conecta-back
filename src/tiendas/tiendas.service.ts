@@ -22,23 +22,24 @@ async create(createTiendaDto: any, file: Express.Multer.File): Promise<Tienda> {
       urlImagen = await this.cloudinaryService.uploadImage(file);
     }
 
+    // Mapeo manual para evitar que TS crea que es un array o un tipo genérico
     const nuevaTienda = this.tiendaRepository.create({
       nombre: createTiendaDto.nombre,
       whatsapp: createTiendaDto.whatsapp,
       direccion: createTiendaDto.direccion,
       horario: createTiendaDto.horario,
       categoria: createTiendaDto.categoria,
-      activo: createTiendaDto.activo || '1', // Por defecto '1' como en tu ejemplo
-      imagen: urlImagen, 
-      plan: { id: Number(createTiendaDto.planId) }
+      activo: createTiendaDto.activo === 'true' || createTiendaDto.activo === true,
+      imagen: urlImagen,
+      plan: { id: Number(createTiendaDto.planId) } as any
     });
 
-    return await this.tiendaRepository.save(nuevaTienda);
+    return await this.tiendaRepository.save(nuevaTienda); 
   } catch (error) {
-    throw new InternalServerErrorException('Error al guardar en MySQL');
+    console.error(error);
+    throw new InternalServerErrorException('Error al crear la tienda');
   }
 }
-
 
   async findAll(): Promise<Tienda[]> {
     return this.tiendaRepository.find({
