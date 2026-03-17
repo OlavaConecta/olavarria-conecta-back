@@ -50,7 +50,7 @@ export class TiendasController {
 
     // 3. Si el usuario subió una imagen nueva para editar
     if (file) {
-      const result = await this.cloudinaryService.uploadFile(file);
+      const result = await this.cloudinaryService.uploadImage(file);
       imageUrl = result;
     }
 

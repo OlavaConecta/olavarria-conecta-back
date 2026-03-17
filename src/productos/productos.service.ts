@@ -21,7 +21,7 @@ export class ProductosService {
     if (file) {
       console.log('Subiendo a Cloudinary archivo:', file.originalname);
       // Forzamos la espera de la URL
-      urlImagen = await this.cloudinaryService.uploadFile(file);
+      urlImagen = await this.cloudinaryService.uploadImage(file);
       console.log('URL recibida de Cloudinary:', urlImagen);
     } else {
       console.log('No llegó ningún archivo al servicio');
@@ -88,7 +88,7 @@ export class ProductosService {
       }
 
       // Subir la nueva imagen
-      const newImageUrl = await this.cloudinaryService.uploadFile(file);
+      const newImageUrl = await this.cloudinaryService.uploadImage(file);
       producto.imagen = newImageUrl;
     }
 
