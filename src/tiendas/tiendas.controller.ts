@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 import { TiendasService } from './tiendas.service';
 import { CreateTiendaDto } from './dto/create-tienda.dto';
 import { UpdateTiendaDto } from './dto/update-tienda.dto';
@@ -8,53 +8,53 @@ import { Tienda } from './entities/tienda.entity';
 
 @Controller('tiendas')
 export class TiendasController {
-  constructor(private readonly tiendasService: TiendasService, private readonly cloudinaryService: CloudinaryService) { }
+  constructor(
+    private readonly tiendasService: TiendasService, 
+    private readonly cloudinaryService: CloudinaryService
+  ) { }
 
   @Post()
   @UseInterceptors(FileInterceptor('imagen_archivo'))
- 
   async create(
-  @UploadedFile() file: Express.Multer.File,
-  @Body() createDto: CreateTiendaDto
-) {
-  // 1. Subir solo la imagen a Cloudinary
-  const imageUrl = await this.cloudinaryService.uploadImage(file);
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createDto: CreateTiendaDto
+  ) {
+    if (!file) {
+      throw new BadRequestException('No se ha subido ningún archivo en "imagen_archivo"');
+    }
 
-  // 2. Combinar la URL con el resto de los datos para la DB
-  const datosCompletos = {
-    ...createDto,
-    imagenUrl: imageUrl, // Solo guardamos el string
-  };
+    // 1. Subir la imagen y obtener la URL string
+    const imageUrl = await this.cloudinaryService.uploadImage(file);
 
-  // 3. Guardar en MySQL a través de tu servicio de TypeORM/Sequelize
-  return this.tiendasService.save(datosCompletos);
-}
+    // 2. Llamamos directamente al método CREATE del servicio
+    // Le pasamos el DTO y el string de la imagen por separado
+    return this.tiendasService.create(createDto, imageUrl);
+  }
+
   @Get()
   findAll() {
     return this.tiendasService.findAll();
   }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tiendasService.findOne(+id);
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('imagen_archivo')) // 1. Agregamos el interceptor
+  @UseInterceptors(FileInterceptor('imagen_archivo'))
   async update(
     @Param('id') id: string,
     @Body() updateTiendaDto: UpdateTiendaDto,
-    @UploadedFile() file: Express.Multer.File // 2. Capturamos el archivo si viene
-  ) :Promise <Tienda>{
- 
-    let imageUrl : string | undefined = undefined; // Usamos undefined para que el service sepa si hubo cambio o no
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<Tienda> {
+    let imageUrl: string | undefined = undefined;
 
-    // 3. Si el usuario subió una imagen nueva para editar
     if (file) {
       const result = await this.cloudinaryService.uploadImage(file);
       imageUrl = result;
     }
 
-    // 4. Ahora le pasamos el tercer parámetro al Service
     return this.tiendasService.update(+id, updateTiendaDto, imageUrl);
   }
 
