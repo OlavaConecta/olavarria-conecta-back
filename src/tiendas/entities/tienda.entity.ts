@@ -22,7 +22,7 @@ export class Tienda {
     @Column()
     horario: string;
 
-    @Column()
+    @Column({type: 'longtext', nullable: true})
     imagen: string;
 
     @Column()
