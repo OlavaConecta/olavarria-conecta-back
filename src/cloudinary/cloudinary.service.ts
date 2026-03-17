@@ -5,7 +5,9 @@ import * as streamifier from 'streamifier';
 
 @Injectable()
 export class CloudinaryService {
- 
+  uploadImage(file: Express.Multer.File) {
+    throw new Error('Method not implemented.');
+  }
   constructor(private configService: ConfigService) {
     cloudinary.config({
       cloud_name: this.configService.get('CLOUDINARY_CLOUD_NAME') || 'dimxduwpw',
@@ -14,7 +16,7 @@ export class CloudinaryService {
     });
   }
 
-  async uploadImage(file: Express.Multer.File): Promise<string> {
+  async uploadFile(file: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
       const upload = cloudinary.uploader.upload_stream(
         {
