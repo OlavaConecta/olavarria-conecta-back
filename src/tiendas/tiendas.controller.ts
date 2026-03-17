@@ -12,29 +12,37 @@ export class TiendasController {
 
  @Post()
 @UseInterceptors(FileInterceptor('imagen_archivo'))
+@Post()
+@UseInterceptors(FileInterceptor('imagen_archivo'))
 async create(
   @UploadedFile() file: Express.Multer.File,
   @Body() createDto: CreateTiendaDto
 ) {
-  if (!file) {
-    throw new BadRequestException('No se recibió la imagen (campo imagen_archivo)');
+  try {
+    if (!file) throw new BadRequestException('Falta la imagen');
+
+    // 1. Subir a Cloudinary
+    const imageUrl = await this.cloudinaryService.uploadFile(file);
+    console.log('URL de imagen generada:', imageUrl);
+
+    // 2. Construir objeto para la DB
+    const datosParaGuardar = {
+      ...createDto,
+      planId: Number(createDto.planId), // Forzamos número por si llega string
+      imagen: imageUrl,
+      imagenUrl: imageUrl,
+    };
+
+    console.log('Intentando guardar en DB:', datosParaGuardar);
+
+    // 3. Guardar
+    return await this.tiendasService.save(datosParaGuardar);
+
+  } catch (error) {
+    // ESTO VA A APARECER EN LOS LOGS DE RAILWAY
+    console.error('ERROR CRÍTICO EN CREATE:', error.message);
+    throw error; 
   }
-
-  // 1. Subir a Cloudinary
-  // Como tu error dice que secure_url no existe en 'string', 
-  // significa que imageUrl YA es el string de la URL.
-  const imageUrl = await this.cloudinaryService.uploadFile(file);
-
-  // 2. Combinar datos
-  // Tu error dice que el objeto REQUIERE 'imagenUrl' y 'imagen'
-  const datosCompletos = {
-    ...createDto,
-    imagen: imageUrl,    // El string de la URL
-    imagenUrl: imageUrl  // También lo pide como imagenUrl según el error
-  };
-
-  // 3. Guardar en DB
-  return this.tiendasService.save(datosCompletos);
 }
   @Get()
   findAll() {
