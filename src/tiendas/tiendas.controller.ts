@@ -13,24 +13,14 @@ export class TiendasController {
     private readonly cloudinaryService: CloudinaryService
   ) { }
 
-  @Post()
-  @UseInterceptors(FileInterceptor('imagen_archivo'))
-  async create(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createDto: CreateTiendaDto
-  ) {
-    if (!file) {
-      throw new BadRequestException('No se ha subido ningún archivo en "imagen_archivo"');
-    }
-
-    // 1. Subir la imagen y obtener la URL string
-    const imageUrl = await this.cloudinaryService.uploadImage(file);
-
-    // 2. Llamamos directamente al método CREATE del servicio
-    // Le pasamos el DTO y el string de la imagen por separado
-    return this.tiendasService.create(createDto, imageUrl);
-  }
-
+@Post()
+@UseInterceptors(FileInterceptor('imagen_archivo'))
+async create(
+  @UploadedFile() file: Express.Multer.File,
+  @Body() createTiendaDto: CreateTiendaDto
+) {
+  return await this.tiendasService.create(createTiendaDto, file);
+}
   @Get()
   findAll() {
     return this.tiendasService.findAll();

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateTiendaDto } from './dto/create-tienda.dto';
 import { UpdateTiendaDto } from './dto/update-tienda.dto';
 import { Tienda } from './entities/tienda.entity';
@@ -15,22 +15,33 @@ export class TiendasService {
   ) { }
 
   // Este es el método que realmente guarda en MySQL
-  async create(createTiendaDto: CreateTiendaDto, imagenUrl: string): Promise<Tienda> {
-    try {
-      const { planId, ...datosTienda } = createTiendaDto;
-      
-      // Creamos la entidad mapeando el planId y la imagen
-      const tienda = this.tiendaRepository.create({
-        ...datosTienda,
-        plan: { id: planId },
-        imagen: imagenUrl // Se guarda el string de la URL
-      });
-      
-      return await this.tiendaRepository.save(tienda);
-    } catch (error) {
-      throw new Error(`Error creating tienda: ${error.message}`);
+ async create(createTiendaDto: any, file: Express.Multer.File): Promise<Tienda> {
+  try {
+    let urlImagen = "";
+
+    if (file) {
+      // Subimos la imagen igual que en productos
+      urlImagen = await this.cloudinaryService.uploadImage(file);
     }
+
+    const nuevaTienda = this.tiendaRepository.create({
+      nombre: createTiendaDto.nombre,
+      whatsapp: createTiendaDto.whatsapp,
+      direccion: createTiendaDto.direccion,
+      horario: createTiendaDto.horario,
+      categoria: createTiendaDto.categoria,
+      activo: createTiendaDto.activo === 'true' || createTiendaDto.activo === true,
+      imagen: urlImagen, // Guardamos la URL que devolvió Cloudinary
+      plan: { id: Number(createTiendaDto.planId) } // <--- IGUAL QUE EN PRODUCTOS
+    });
+
+    return await this.tiendaRepository.save(nuevaTienda);
+  } catch (error) {
+    console.error('Error al crear tienda:', error);
+    throw new InternalServerErrorException('Error al crear la tienda');
   }
+}
+
 
   async findAll(): Promise<Tienda[]> {
     return this.tiendaRepository.find({
