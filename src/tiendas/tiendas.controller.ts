@@ -23,7 +23,8 @@ export class TiendasController {
   // 2. Combinar la URL con el resto de los datos para la DB
   const datosCompletos = {
     ...createDto,
-    imagenUrl: imageUrl, // Solo guardamos el string
+    imagenUrl: imageUrl,
+    imagen: imageUrl // Solo guardamos el string
   };
 
   // 3. Guardar en MySQL a través de tu servicio de TypeORM/Sequelize

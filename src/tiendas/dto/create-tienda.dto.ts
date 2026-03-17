@@ -1,29 +1,39 @@
-import {IsBoolean, IsNotEmpty, IsNumber,IsString} from 'class-validator'
+import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer'; // <--- IMPORTANTE
+
 export class CreateTiendaDto {
-
-
     @IsString()
+    @IsNotEmpty()
     nombre: string;
 
     @IsString()
+    @IsNotEmpty()
     whatsapp: string;
 
     @IsString()
-    direccion:string;
+    @IsNotEmpty()
+    direccion: string;
 
     @IsString()
-    horario:string;
+    @IsNotEmpty()
+    horario: string;
 
+    // Cambiamos a IsOptional porque la imagen la maneja el Interceptor, 
+    // y el DTO a veces se queja si el archivo no es un string.
     @IsString()
-    imagen:string;
+    @IsOptional()
+    imagen?: string;
 
+    @Type(() => Boolean) // <--- Fuerza la conversión a Booleano
     @IsBoolean()
-    activo:boolean;
+    activo: boolean;
 
+    @Type(() => Number)  // <--- Fuerza la conversión a Número
     @IsNumber()
     @IsNotEmpty()
     planId: number;
 
     @IsString()
-    categoria:string;
+    @IsNotEmpty()
+    categoria: string;
 }
