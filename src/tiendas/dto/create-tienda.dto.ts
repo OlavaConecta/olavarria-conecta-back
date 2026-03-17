@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {IsBoolean, IsNotEmpty, IsNumber,IsString} from 'class-validator'
 export class CreateTiendaDto {
 
@@ -15,11 +16,12 @@ export class CreateTiendaDto {
     horario:string;
 
     @IsString()
-    imagen:string;
+    imagen?:string;
 
     @IsBoolean()
     activo:boolean;
 
+    @Type(() => Number)
     @IsNumber()
     @IsNotEmpty()
     planId: number;
