@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 import { TiendasService } from './tiendas.service';
 import { CreateTiendaDto } from './dto/create-tienda.dto';
 import { UpdateTiendaDto } from './dto/update-tienda.dto';
@@ -10,24 +10,30 @@ import { Tienda } from './entities/tienda.entity';
 export class TiendasController {
   constructor(private readonly tiendasService: TiendasService, private readonly cloudinaryService: CloudinaryService) { }
 
-  @Post()
-  @UseInterceptors(FileInterceptor('imagen_archivo'))
- 
-  async create(
+ @Post()
+@UseInterceptors(FileInterceptor('imagen_archivo'))
+async create(
   @UploadedFile() file: Express.Multer.File,
   @Body() createDto: CreateTiendaDto
 ) {
-  // 1. Subir solo la imagen a Cloudinary
+  if (!file) {
+    throw new BadRequestException('No se recibió la imagen (campo imagen_archivo)');
+  }
+
+  // 1. Subir a Cloudinary
+  // Como tu error dice que secure_url no existe en 'string', 
+  // significa que imageUrl YA es el string de la URL.
   const imageUrl = await this.cloudinaryService.uploadFile(file);
 
-  // 2. Combinar la URL con el resto de los datos para la DB
+  // 2. Combinar datos
+  // Tu error dice que el objeto REQUIERE 'imagenUrl' y 'imagen'
   const datosCompletos = {
     ...createDto,
-    imagenUrl: imageUrl,
-    imagen: imageUrl // Solo guardamos el string
+    imagen: imageUrl,    // El string de la URL
+    imagenUrl: imageUrl  // También lo pide como imagenUrl según el error
   };
 
-  // 3. Guardar en MySQL a través de tu servicio de TypeORM/Sequelize
+  // 3. Guardar en DB
   return this.tiendasService.save(datosCompletos);
 }
   @Get()
