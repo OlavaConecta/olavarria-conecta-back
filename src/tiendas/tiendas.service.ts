@@ -8,22 +8,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TiendasService {
-  cloudinaryService: any;
-  save(datosCompletos: { imagenUrl: any; nombre: string; whatsapp: string; direccion: string; horario: string; imagen: string; activo: boolean; planId: number; categoria: string; }) {
-    throw new Error('Method not implemented.');
-  }
-
+  [x: string]: any;
   constructor(
-    @InjectRepository(Tienda) private readonly tiendaRepository: Repository<Tienda>
-  ){}
+    @InjectRepository(Tienda)
+    private readonly tiendaRepository: Repository<Tienda>,
+  ) {}
 
-  async create(createTiendaDto: CreateTiendaDto, imagenUrl: string): Promise<Tienda> {
+  async save(datos: any) {
     try {
-      const {planId,...datosTienda} = createTiendaDto;
-      const tienda = this.tiendaRepository.create({...datosTienda,plan:{id:planId},imagen:imagenUrl});
-      return await this.tiendaRepository.save(tienda);
+      // 1. Creamos la instancia de la entidad con los datos que vienen del controller
+      const nuevaTienda = this.tiendaRepository.create(datos);
+      
+      // 2. La guardamos físicamente en MySQL
+      return await this.tiendaRepository.save(nuevaTienda);
     } catch (error) {
-      throw new Error(`Error creating tienda: ${error.message}`);
+      console.error('Error al guardar en el Repositorio:', error.message);
+      throw error;
     }
   }
 
