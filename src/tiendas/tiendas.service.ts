@@ -15,12 +15,10 @@ export class TiendasService {
   ) { }
 
   // Este es el método que realmente guarda en MySQL
- async create(createTiendaDto: any, file: Express.Multer.File): Promise<Tienda> {
+async create(createTiendaDto: any, file: Express.Multer.File): Promise<Tienda> {
   try {
     let urlImagen = "";
-
     if (file) {
-      // Subimos la imagen igual que en productos
       urlImagen = await this.cloudinaryService.uploadImage(file);
     }
 
@@ -30,15 +28,14 @@ export class TiendasService {
       direccion: createTiendaDto.direccion,
       horario: createTiendaDto.horario,
       categoria: createTiendaDto.categoria,
-      activo: createTiendaDto.activo === 'true' || createTiendaDto.activo === true,
-      imagen: urlImagen, // Guardamos la URL que devolvió Cloudinary
-      plan: { id: Number(createTiendaDto.planId) } // <--- IGUAL QUE EN PRODUCTOS
+      activo: createTiendaDto.activo || '1', // Por defecto '1' como en tu ejemplo
+      imagen: urlImagen, 
+      plan: { id: Number(createTiendaDto.planId) }
     });
 
     return await this.tiendaRepository.save(nuevaTienda);
   } catch (error) {
-    console.error('Error al crear tienda:', error);
-    throw new InternalServerErrorException('Error al crear la tienda');
+    throw new InternalServerErrorException('Error al guardar en MySQL');
   }
 }
 

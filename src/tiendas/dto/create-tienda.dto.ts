@@ -1,36 +1,23 @@
-import { IsNotEmpty, IsNumber, IsString, IsOptional, IsBoolean } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from "class-validator";
 import { Type } from 'class-transformer';
 
 export class CreateTiendaDto {
-    @IsString()
-    nombre: string;
+    @IsString() nombre: string;
+    @IsString() whatsapp: string;
+    @IsString() direccion: string;
+    @IsString() horario: string;
+    @IsString() categoria: string;
 
-    @IsString()
-    whatsapp: string;
-
-    @IsString()
-    direccion: string;
-
-    @IsString()
-    horario: string;
-
-    @IsString()
-    categoria: string;
-
-    // ESTO ES CLAVE: En el DTO de productos te funciona, pero aquí
-    // lo ponemos opcional para que NestJS no lo pida en el JSON del Body.
-    @IsOptional()
-    @IsString()
+    @IsOptional() // Permitimos que venga vacío porque la URL la pone el Service
+    @IsString() 
     imagen?: string;
 
-    // Usamos Type para que el string "1" de FormData pase a ser el número 1
-    @Type(() => Number)
+    @Type(() => Number) // Esto convierte el "1" que manda el FormData en un 1 real
     @IsNumber()
     @IsNotEmpty()
     planId: number;
 
-    @IsOptional() // Por si no lo mandás, que no rompa
-    @IsBoolean()
-    @Type(() => Boolean)
-    activo: boolean;
+    // Usamos string o opcional para "activo" porque MySQL lo tiene como '1'
+    @IsOptional()
+    activo?: any;
 }
