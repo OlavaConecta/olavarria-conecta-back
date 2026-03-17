@@ -13,7 +13,7 @@ async function bootstrap() {
       'https://www.olavarriaconecta.com',
       'http://localhost:5173' // Para que te siga funcionando en desarrollo
     ],
-    methods:'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods:'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials:true,
   }
 )
