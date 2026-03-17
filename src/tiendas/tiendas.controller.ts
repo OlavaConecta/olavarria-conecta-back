@@ -12,8 +12,7 @@ export class TiendasController {
 
  @Post()
 @UseInterceptors(FileInterceptor('imagen_archivo'))
-@Post()
-@UseInterceptors(FileInterceptor('imagen_archivo'))
+
 async create(
   @UploadedFile() file: Express.Multer.File,
   @Body() createDto: CreateTiendaDto
