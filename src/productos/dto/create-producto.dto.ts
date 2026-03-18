@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateProductoDto {
 
@@ -14,6 +14,7 @@ export class CreateProductoDto {
     @IsNumber()
     precio: number;
 
+    @IsOptional()
     @IsString()
     imagen:string;
 
