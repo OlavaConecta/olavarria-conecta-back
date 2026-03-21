@@ -49,7 +49,8 @@ async create(
   }
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.tiendasService.findOne(+id);
+    const realId = id.split('-')[0]; // Si viene con guion, tomamos solo la parte numérica
+    return this.tiendasService.findOne(+realId);
   }
 
   @Patch(':id')
