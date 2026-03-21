@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query,UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query,UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
@@ -22,7 +22,13 @@ async create(
   @Get()
   findAll(@Query('tiendaId')tiendaId:string) {
     if(tiendaId){
-      return this.productosService.findAllByTienda(+tiendaId);
+      const realId = tiendaId.split('-')[0]; // Si viene con guion, tomamos solo la parte numérica
+      const numericId = +realId
+
+      if (isNaN(numericId)) {
+        throw new BadRequestException('El parámetro tiendaId debe ser un número válido');
+      }
+      return this.productosService.findAllByTienda(numericId);
     }
     return this.productosService.findAll();
   }
