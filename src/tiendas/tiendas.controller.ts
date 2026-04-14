@@ -6,7 +6,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Tienda } from './entities/tienda.entity';
 
-@Controller()
+@Controller('tiendas')
 export class TiendasController {
   constructor(private readonly tiendasService: TiendasService, private readonly cloudinaryService: CloudinaryService) { }
 
@@ -49,14 +49,7 @@ async create(
   }
   @Get(':id')
   findOne(@Param('id') id: string) {
-    const partes = id.split('-');
-    const ultimoSegmento = partes.pop(); // Si viene con guion, tomamos solo la parte numérica
-   // VALIDACIÓN CRÍTICA
-  if (!ultimoSegmento || isNaN(Number(ultimoSegmento))) {
-    console.error(`ERROR: Se recibió una URL inválida: ${id}`);
-    throw new BadRequestException('La URL debe terminar con el ID numérico de la tienda.');
-  }
-  const realId = Number(ultimoSegmento);
+    const realId = id.split('-')[0]; // Si viene con guion, tomamos solo la parte numérica
     return this.tiendasService.findOne(+realId);
   }
 
