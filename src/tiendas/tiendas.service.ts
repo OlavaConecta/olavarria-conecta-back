@@ -21,8 +21,9 @@ export class TiendasService {
       
       // 2. La guardamos físicamente en MySQL
       return await this.tiendaRepository.save(nuevaTienda);
-    } catch (error) {
-      console.error('Error al guardar en el Repositorio:', error.message);
+    } catch (error:unknown) {
+      const mensaje = error instanceof Error ? error.message : 'Error desconocido';
+      console.error('Error al guardar en el Repositorio:', mensaje);
       throw error;
     }
   }

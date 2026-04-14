@@ -6,7 +6,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Tienda } from './entities/tienda.entity';
 
-@Controller('tiendas')
+@Controller()
 export class TiendasController {
   constructor(private readonly tiendasService: TiendasService, private readonly cloudinaryService: CloudinaryService) { }
 
