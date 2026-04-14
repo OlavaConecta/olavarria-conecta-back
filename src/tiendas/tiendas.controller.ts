@@ -50,10 +50,13 @@ async create(
   @Get(':id')
   findOne(@Param('id') id: string) {
     const partes = id.split('-');
-    const realId = partes.pop(); // Si viene con guion, tomamos solo la parte numérica
-    if (!realId){
-      throw new BadRequestException('ID inválido');
-    }
+    const ultimoSegmento = partes.pop(); // Si viene con guion, tomamos solo la parte numérica
+   // VALIDACIÓN CRÍTICA
+  if (!ultimoSegmento || isNaN(Number(ultimoSegmento))) {
+    console.error(`ERROR: Se recibió una URL inválida: ${id}`);
+    throw new BadRequestException('La URL debe terminar con el ID numérico de la tienda.');
+  }
+  const realId = Number(ultimoSegmento);
     return this.tiendasService.findOne(+realId);
   }
 
