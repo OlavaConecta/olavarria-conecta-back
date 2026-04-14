@@ -37,7 +37,7 @@ async create(
     // 3. Guardar
     return await this.tiendasService.save(datosParaGuardar);
 
-  } catch (error) {
+  } catch (error:any) {
     // ESTO VA A APARECER EN LOS LOGS DE RAILWAY
     console.error('ERROR CRÍTICO EN CREATE:', error.message);
     throw error; 
@@ -49,7 +49,11 @@ async create(
   }
   @Get(':id')
   findOne(@Param('id') id: string) {
-    const realId = id.split('-')[0]; // Si viene con guion, tomamos solo la parte numérica
+    const partes = id.split('-');
+    const realId = partes.pop(); // Si viene con guion, tomamos solo la parte numérica
+    if (!realId){
+      throw new BadRequestException('ID inválido');
+    }
     return this.tiendasService.findOne(+realId);
   }
 
