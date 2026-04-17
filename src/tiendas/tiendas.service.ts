@@ -4,6 +4,7 @@ import { UpdateTiendaDto } from './dto/update-tienda.dto';
 import { Tienda } from './entities/tienda.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import slugify from 'slugify';
 
 
 @Injectable()
@@ -14,10 +15,34 @@ export class TiendasService {
     private readonly tiendaRepository: Repository<Tienda>,
   ) {}
 
+  private async generarSlugUnico(nombre:string): Promise<string> {
+    const baseSlug = slugify (nombre, { lower: true, strict: true });
+    const existe = await this.tiendaRepository.findOneBy({ slug: baseSlug });
+    if (!existe) return baseSlug;
+
+    const suffix = Math.random().toString(36).substring(2, 5);
+    return `${baseSlug}-${suffix}`;
+  }
+async migrarSlugsExistentes() {
+  const tiendas = await this.tiendaRepository.find();
+  console.log(`Iniciando migración de ${tiendas.length} tiendas...`);
+
+  for (const tienda of tiendas) {
+    if (!tienda.slug && tienda.nombre) {
+      tienda.slug = await this.generarSlugUnico(tienda.nombre);
+      await this.tiendaRepository.save(tienda);
+    }
+  }
+  return { status: 'Migración completada con éxito' };
+}
+
   async save(datos: any) {
     try {
       // 1. Creamos la instancia de la entidad con los datos que vienen del controller
-      const nuevaTienda = this.tiendaRepository.create(datos);
+      const nuevaTienda:any = this.tiendaRepository.create(datos);
+      if (datos.nombre){
+        nuevaTienda.slug = await this.generarSlugUnico(datos.nombre);
+      }
       
       // 2. La guardamos físicamente en MySQL
       return await this.tiendaRepository.save(nuevaTienda);
@@ -26,6 +51,15 @@ export class TiendasService {
       console.error('Error al guardar en el Repositorio:', mensaje);
       throw error;
     }
+  }
+
+  async findOneBySlug(slug: string): Promise<Tienda | null> {
+    const tienda = await this.tiendaRepository.findOne({
+      where:{slug},
+      relations:['plan', 'productos']
+    })
+    if (!tienda) throw new NotFoundException(`Tienda con slug ${slug} no encontrada`);
+    return tienda;
   }
 
   async findAll(): Promise <Tienda[]> {

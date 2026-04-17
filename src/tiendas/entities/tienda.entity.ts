@@ -27,9 +27,12 @@ export class Tienda {
 
     @Column()
     activo: boolean;
-    ;
+    
     @Column({ name: 'categoria', type: 'varchar', nullable: true }) // Esto lee el texto "Mascotas", "Peluquería", etc.
     categoria: string;
+
+    @Column ({unique:true, nullable:true})
+    slug:string;
 
     @ManyToOne(() => Planes, (plan) => plan.tiendas)
     @JoinColumn({ name: 'planId' })
