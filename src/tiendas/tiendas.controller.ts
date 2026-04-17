@@ -52,11 +52,7 @@ async create(
     const realId = id.split('-')[0]; // Si viene con guion, tomamos solo la parte numérica
     return this.tiendasService.findOne(+realId);
   }
-@Patch('mecanismo-migracion-slugs')
-async migrar() {
-  return await this.tiendasService.migrarSlugsExistentes();
-}
-//despues borrar
+
   @Patch(':id')
   @UseInterceptors(FileInterceptor('imagen_archivo')) // 1. Agregamos el interceptor
   async update(

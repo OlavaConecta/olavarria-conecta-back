@@ -23,18 +23,7 @@ export class TiendasService {
     const suffix = Math.random().toString(36).substring(2, 5);
     return `${baseSlug}-${suffix}`;
   }
-async migrarSlugsExistentes() {
-  const tiendas = await this.tiendaRepository.find();
-  console.log(`Iniciando migración de ${tiendas.length} tiendas...`);
 
-  for (const tienda of tiendas) {
-    if (!tienda.slug && tienda.nombre) {
-      tienda.slug = await this.generarSlugUnico(tienda.nombre);
-      await this.tiendaRepository.save(tienda);
-    }
-  }
-  return { status: 'Migración completada con éxito' };
-}
 
   async save(datos: any) {
     try {
