@@ -10,7 +10,7 @@ import {MailerModule} from '@nestjs-modules/mailer';
         host:'smtp.gmail.com',
         auth:{
           user:'olavarriaconecta@gmail.com',
-        pass:'obvc zmsf caan ehnv',
+        pass:'obvczmsfcaanehnv',
         },
 },
       defaults:{
