@@ -8,7 +8,13 @@ export class MailController {
   constructor(private readonly mailService: MailService) {}
 
   @Post('enviar')
-  create(@Body() createMailDto: CreateMailDto) {
-    return this.mailService.enviarContacto(createMailDto);
+  async enviarContacto(@Body() createMailDto: CreateMailDto) {
+    return await this.mailService.enviarContacto(
+      createMailDto.nombre,
+      createMailDto.nombreLocal,
+      createMailDto.telefono,
+      createMailDto.email,
+      createMailDto.mensaje
+    );
   }
 }

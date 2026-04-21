@@ -1,46 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMailDto } from './dto/create-mail.dto';
-import {MailerService} from '@nestjs-modules/mailer';
+import { Resend } from 'resend';
 
 
 
 @Injectable()
 export class MailService {
-  constructor(private readonly mailerService: MailerService) {}
+  // Inicializamos Resend con la variable que pusiste en Railway
+  private readonly resend = new Resend(process.env.RESEND_API_KEY);
 
-async enviarContacto(createMailDto: CreateMailDto) {
-  const { nombre, nombreLocal, telefono, email, mensaje } = createMailDto;
-
-  try {
-    await this.mailerService.sendMail({
-      to: 'olavarriaconecta@gmail.com', 
-      subject: `Nueva consulta: ${nombreLocal} (${nombre})`,
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-          <h2 style="color: #2c3e50;">¡Nuevo mensaje desde Olavarría Conecta!</h2>
-          <hr />
-          <p><strong>Comercio:</strong> ${nombreLocal}</p>
-          <p><strong>Responsable:</strong> ${nombre}</p>
-          <p><strong>Teléfono:</strong> ${telefono}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Mensaje:</strong></p>
-          <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; margin: 10px 0;">
-            ${mensaje}
+  async enviarContacto(nombre: string,nombreLocal:string,telefono:string, email: string, mensaje: string) {
+    try {
+      const { data, error } = await this.resend.emails.send({
+        from: 'Olavarria Conecta <onboarding@resend.dev>', // No cambies este mail todavía
+        to: 'olavarriaconecta@gmail.com', // Tu mail donde querés recibir los avisos
+        subject: `Mensaje de ${nombre} - Olavarría Conecta`,
+        html: `
+          <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
+            <h2 style="color: #007bff;">Nuevo mensaje de contacto</h2>
+            <p><strong>De:</strong> ${nombre}</p>
+            <p><strong>Comercio:</strong> ${nombreLocal}</p>
+            <p><strong>Teléfono:</strong> ${telefono}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <hr />
+            <p><strong>Mensaje:</strong></p>
+            <p style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">${mensaje}</p>
           </div>
-          <footer style="font-size: 12px; color: #7f8c8d; margin-top: 20px;">
-            Este mensaje fue generado automáticamente por el sistema de Olavarría Conecta.
-          </footer>
-        </div>
-      `,
-    });
-    
-    // 3. Importante: devolvemos un objeto claro para que el front lo lea
-    return { status: 'success', message: 'Email enviado correctamente' };
-    
-  } catch (error) {
-    // Esto te permite ver en Railway EXACTAMENTE qué falló si vuelve a dar 500
-    console.error("Error en el envío de mail:", error);
-    throw error; 
+        `,
+      });
+
+      if (error) {
+        console.error('Error de Resend:', error);
+        return { success: false, error };
+      }
+
+      console.log('¡Mail enviado!', data);
+      return { success: true };
+    } catch (err) {
+      console.error('Error inesperado:', err);
+      return { success: false };
+    }
   }
-} 
 }

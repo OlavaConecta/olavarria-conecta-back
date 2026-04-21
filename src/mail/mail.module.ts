@@ -1,32 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { MailController } from './mail.controller';
-import { MailerModule } from '@nestjs-modules/mailer';
+
 
 @Module({
-  imports: [
-    MailerModule.forRoot({
-      transport: {
-        host: '74.125.142.108',
-        port: 465,
-        secure: true,
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASSWORD,
-        },
-        tls: {
-          servername: 'smtp.gmail.com',
-          rejectUnauthorized: false,
-        },
-        connectionTimeout: 20000,
-        greetingTimeout: 20000
-      },
-      defaults: {
-        from: `Olavarria Conecta <${process.env.MAIL_USER}>`,
-      },
-    }),
-  ],
+  imports: [],
   controllers: [MailController],
   providers: [MailService],
+  exports:[MailService]
 })
 export class MailModule { }
