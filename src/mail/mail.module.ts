@@ -8,8 +8,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
+        port: 465,
+        secure: true,
         auth: {
           user: process.env.MAIL_USER,
           pass: process.env.MAIL_PASSWORD,
@@ -17,6 +17,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
         tls: {
           rejectUnauthorized: false,
         },
+        connectionTimeout:20000,
+        greetingTimeout:20000
       },
       defaults: {
         from: `Olavarria Conecta <${process.env.MAIL_USER}>`,
