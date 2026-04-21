@@ -1,14 +1,23 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateMailDto {
-    nombre:string;
-
-    nombreLocal:string;
     @IsString()
     @IsNotEmpty()
-    telefono:string;
+    nombre: string;
     
-    email:string;
+    @IsString()
+    @IsNotEmpty()
+    nombreLocal: string;
     
-    mensaje:string;
+    @IsString()
+    @IsNotEmpty()
+    telefono: string;
+    
+    @IsEmail()
+    @IsNotEmpty()
+    email: string;
+    
+    @IsString()
+    @IsNotEmpty()
+    mensaje: string;
 }
