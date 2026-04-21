@@ -10,10 +10,10 @@ import { MailerModule } from '@nestjs-modules/mailer';
         host: 'smtp.gmail.com',
         port: 587,
         secure: false,
-        connectionTimeout: 10000, // 10 segundos de espera
+        family: 4,
+        connectionTimeout: 20000, // 10 segundos de espera
         greetingTimeout: 20000,
         socketTimeout: 20000,
-        dnsV_4: true,
         auth: {
           user: process.env.MAIL_USER,
           pass: process.env.MAIL_PASSWORD,
