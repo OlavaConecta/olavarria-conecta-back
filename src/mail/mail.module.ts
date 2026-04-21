@@ -11,8 +11,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
         port: 587,
         secure: false,
         connectionTimeout: 10000, // 10 segundos de espera
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
+        greetingTimeout: 20000,
+        socketTimeout: 20000,
         dnsV_4: true,
         auth: {
           user: process.env.MAIL_USER,
