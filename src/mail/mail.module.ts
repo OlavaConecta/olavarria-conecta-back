@@ -7,7 +7,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: '74.125.142.108',
+        host: 'smtp.gmail.com',
         port: 587,
         secure: false,
         auth: {
@@ -15,7 +15,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
           pass: process.env.MAIL_PASSWORD,
         },
         tls: {
-          servername: 'smtp.gmail.com',
           rejectUnauthorized: false,
         },
       },
