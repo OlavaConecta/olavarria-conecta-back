@@ -12,9 +12,9 @@ export class MailService {
   async enviarContacto(nombre: string,nombreLocal:string,telefono:string, email: string, mensaje: string) {
     try {
       const { data, error } = await this.resend.emails.send({
-        from: 'Olavarria Conecta <onboarding@resend.dev>', // No cambies este mail todavía
+        from: 'Olavarria Conecta <contacto@olavarriaconecta.com>', // No cambies este mail todavía
         to: 'olavarriaconecta@gmail.com', // Tu mail donde querés recibir los avisos
-        subject: `Mensaje de ${nombre} - Olavarría Conecta`,
+        subject: `🚀 Mensaje de ${nombre} - Olavarría Conecta`,
      html: `
           <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px;">
             <h2 style="color: #007bff; font-size: 24px;">🚀 Nuevo mensaje de contacto</h2>
