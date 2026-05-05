@@ -39,7 +39,10 @@ export class Tienda {
     plan: Planes;
 
 
-    @OneToMany(() => Producto, (producto) => producto.tienda)
+    @OneToMany(() => Producto, (producto) => producto.tienda,{
+        cascade:true,
+        onDelete: 'CASCADE'
+    })
     productos: Producto[];
 }
 
