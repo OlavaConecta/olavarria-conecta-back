@@ -24,8 +24,9 @@ export class CloudinaryService {
           format: 'webp',
           transformation: [{ quality: 'auto' }]
         },
-        (error: UploadApiErrorResponse, result: UploadApiResponse) => {
+        (error?: UploadApiErrorResponse, result?: UploadApiResponse) => {
           if (error) return reject(error);
+          if (!result) return reject(new Error("No se recibió el resultado de Cloudinary"));
           // Retornamos solo la URL segura para guardarla en MySQL
           resolve(result.secure_url);
         },

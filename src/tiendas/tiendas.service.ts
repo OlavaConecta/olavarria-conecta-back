@@ -5,6 +5,7 @@ import { Tienda } from './entities/tienda.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import slugify from 'slugify';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 
 @Injectable()
@@ -13,6 +14,7 @@ export class TiendasService {
   constructor(
     @InjectRepository(Tienda)
     private readonly tiendaRepository: Repository<Tienda>,
+    private readonly cloudinaryService: CloudinaryService
   ) {}
 
   private async generarSlugUnico(nombre:string): Promise<string> {
@@ -104,7 +106,32 @@ async update(id: number, updateTiendaDto: UpdateTiendaDto, imagenUrl?: string) {
     if (!tienda){
       throw new NotFoundException('tienda no encontrada');
     }
-    await this.tiendaRepository.remove(tienda);
-  
-}
-}
+   // 2. Definimos la lógica de borrado de imágenes
+  const borrarImagenCloudinary = async (url: string) => {
+    if (!url) return;
+    try {
+      const partes = url.split('/');
+      const nombreArchivoConExtension = partes[partes.length - 1];
+      const carpeta = partes[partes.length - 2];
+      const nombreSinExtension = nombreArchivoConExtension.split('.')[0];
+      const publicId = `${carpeta}/${nombreSinExtension}`; 
+      
+      await this.cloudinaryService.deleteFile(publicId);
+    } catch (error) {
+      console.error('Error al borrar en Cloudinary:', error);
+    }
+  }; // <--- Aquí cierra la función interna
+
+  // 3. Borramos fotos de productos de Olavarría Conecta
+  if (tienda.productos && tienda.productos.length > 0) {
+    for (const producto of tienda.productos) {
+      await borrarImagenCloudinary(producto.imagen);
+    }
+  }
+
+  // 4. Borramos el logo de la tienda
+  await borrarImagenCloudinary(tienda.imagen);
+
+  // 5. Borramos de MySQL (lo que hacía tu original)
+  return await this.tiendaRepository.remove(tienda);
+} }
