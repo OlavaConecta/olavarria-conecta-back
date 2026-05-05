@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query,UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query,UseInterceptors, UploadedFile, BadRequestException, Put } from '@nestjs/common';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
@@ -38,7 +38,8 @@ async create(
     return this.productosService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('imagen_archivo'))
   update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto, @UploadedFile() file: Express.Multer.File) {
     return this.productosService.update(+id, updateProductoDto, file);
   }
