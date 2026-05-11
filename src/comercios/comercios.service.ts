@@ -28,11 +28,13 @@ export class ComerciosService {
     return await this.comercioRepository.save(nuevoComercio);
   }
 
-  async findOneByNombreUsuario(nombreUsuario: string) {
-  // Ahora TypeORM reconocerá 'nombreUsuario' porque existe en la Entidad
-  return await this.comercioRepository.findOne({ 
-    where: { nombreUsuario: nombreUsuario } 
+ async findOneByNombreUsuario(nombreUsuario: string) {
+  // Forzamos la búsqueda ignorando cualquier otro estado
+  const comercio = await this.comercioRepository.findOne({ 
+    where: { nombreUsuario: nombreUsuario.trim() } 
   });
+  console.log('Resultado de DB:', comercio ? 'Encontrado' : 'No encontrado');
+  return comercio;
 }
 
   findAll() {
