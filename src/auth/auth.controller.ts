@@ -9,4 +9,10 @@ export class AuthController {
   async login(@Body() body: { email: string, contrasena: string }) {
     return this.authService.validateUser(body.email, body.contrasena);
   }
+
+  // --- LOGIN PARA COMERCIOS (Tecnomanía y otros) ---
+  @Post('login-comercio') // Ruta: http://localhost:3000/auth/login-comercio
+  async loginComercio(@Body() body: { nombreUsuario: string, contrasena: string }) {
+    return this.authService.validateComercio(body.nombreUsuario, body.contrasena);
+  }
 }

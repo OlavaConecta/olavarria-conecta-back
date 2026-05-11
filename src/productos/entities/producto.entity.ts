@@ -1,3 +1,4 @@
+import { Comercio } from "src/comercios/entities/comercio.entity";
 import { Tienda } from "src/tiendas/entities/tienda.entity";
 import { Column, Entity, JoinColumn, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 
@@ -19,8 +20,14 @@ export class Producto {
     @Column({ type: 'longtext', nullable: true })
     imagen: string;
 
-    @ManyToOne(()=>Tienda, (tienda)=>tienda.productos)
-    @JoinColumn({ name: 'tiendaId' })   
+    @ManyToOne(() => Tienda, (tienda) => tienda.productos)
+    @JoinColumn({ name: 'tiendaId' })
     tienda: Tienda;
 
+
+    @ManyToOne(() => Comercio, (comercio) => comercio.productos)
+    comercio: Comercio;
+
+    @Column()
+    comercioId: number; // El campo físico en la tabla
 }

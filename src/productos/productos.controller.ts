@@ -43,6 +43,17 @@ async create(
   update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto, @UploadedFile() file: Express.Multer.File) {
     return this.productosService.update(+id, updateProductoDto, file);
   }
+  
+  // ESTA ES LA RUTA PARA EL DASHBOARD DE LOS COMERCIOS
+  @Patch('dashboard/:id')
+updateParcial(
+  @Param('id') id: string, 
+  @Body() updateProductoDto: UpdateProductoDto
+) {
+  // Usamos "as any" o simplemente no pasamos el tercer parámetro
+  // para que TypeScript no se queje de que falta el "File"
+  return this.productosService.update(+id, updateProductoDto, undefined as any);
+}
 
   @Delete(':id')
   remove(@Param('id') id: string) {

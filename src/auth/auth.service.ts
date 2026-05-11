@@ -1,10 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AdminService } from '../admin/admin.service';
+import { ComerciosService } from 'src/comercios/comercios.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly comerciosService: ComerciosService
+  ) {}
 
   async validateUser(email: string, contrasena: string): Promise<any> {
     console.log('datos que llegan del front', email, contrasena);
@@ -26,6 +30,28 @@ export class AuthService {
 
     // 3. Si todo está bien, devolvemos el admin (sin la contraseña)
     const { contrasena: _, ...result } = admin;
+    return result;
+  }
+  // --- VALIDACIÓN DE COMERCIO (Nueva para Tecnomanía y otros) ---
+  async validateComercio(nombreUsuario: string, contrasena: string): Promise<any> {
+    console.log('Login Comercio:', nombreUsuario);
+
+    // 1. Buscamos por nombre de usuario en lugar de email
+    const comercio = await this.comerciosService.findOneByNombreUsuario(nombreUsuario);
+    
+    if (!comercio) {
+      throw new UnauthorizedException('El nombre de usuario no existe');
+    }
+
+    // 2. Comparamos con bcrypt
+    const isMatch = await bcrypt.compare(contrasena, comercio.contrasena);
+
+    if (!isMatch) {
+      throw new UnauthorizedException('Contraseña incorrecta');
+    }
+
+    // 3. Devolvemos el comercio sin la pass
+    const { contrasena: _, ...result } = comercio;
     return result;
   }
 }

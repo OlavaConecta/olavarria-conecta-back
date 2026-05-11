@@ -107,12 +107,36 @@ export class ProductosService {
     throw new InternalServerErrorException('Error al actualizar producto');
   }
 }
+async updatePrecioYStock(id: number, precio: number): Promise<Producto> {
+  const producto = await this.productoRepository.findOne({ where: { id } });
+  
+  if (!producto) throw new NotFoundException('Producto no encontrado');
 
-  async remove(id: number) {
-   const producto = await this.productoRepository.findOne({ where: { id } });
-   if(!producto){
-    throw new NotFoundException('Producto no encontrado');
-   }
-   await this.productoRepository.remove(producto);
+  // Solo actualizamos el precio. 
+  // Al no pasar por la lógica de 'file', no hay riesgo de borrar nada en Cloudinary.
+  producto.precio = Number(precio);
+  
+  return await this.productoRepository.save(producto);
+}
+
+ async remove(id: number) {
+  const producto = await this.productoRepository.findOne({ where: { id } });
+  if (!producto) throw new NotFoundException('Producto no encontrado');
+
+  // IMPORTANTE: Si un comercio borra un producto, 
+  // aprovechamos tu lógica de Cloudinary para no dejar basura en la nube.
+  if (producto.imagen) {
+    try {
+      const urlParts = producto.imagen.split('/');
+      const fileName = urlParts[urlParts.length - 1].split('.')[0];
+      // Ajustá esto a tu carpeta: 'olavarria_conecta/productos/...'
+      const publicId = `olavarria_conecta/productos/${fileName}`; 
+      await this.cloudinaryService.deleteFile(publicId);
+    } catch (e) {
+      console.warn('No se pudo borrar de Cloudinary, pero procedemos con la DB');
+    }
   }
+
+  await this.productoRepository.remove(producto);
+}
 }
