@@ -16,7 +16,10 @@ export class ComerciosController {
   findAll() {
     return this.comerciosService.findAll();
   }
-
+  @Get('nombre/:nombreUsuario')
+  async findOneByNombre(@Param('nombreUsuario') nombreUsuario: string) {
+    return this.comerciosService.findOneByNombreUsuario(nombreUsuario);
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.comerciosService.findOne(+id);
