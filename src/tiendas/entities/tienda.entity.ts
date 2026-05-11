@@ -1,4 +1,5 @@
 import { Categoria } from 'src/categorias/entities/categoria.entity';
+import { Comercio } from 'src/comercios/entities/comercio.entity';
 import { Planes } from 'src/planes/entities/plane.entity';
 import { Producto } from 'src/productos/entities/producto.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -44,6 +45,10 @@ export class Tienda {
         onDelete: 'CASCADE'
     })
     productos: Producto[];
+
+    @ManyToOne(() => Comercio, (comercio) => comercio.tiendas)
+@JoinColumn({ name: 'comercioId' }) // Esto coincide con tu captura de Workbench
+comercio: Comercio;
 }
 
 //falta los one to many con productos y categorias

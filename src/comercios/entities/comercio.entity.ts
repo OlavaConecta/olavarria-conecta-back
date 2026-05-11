@@ -1,14 +1,15 @@
 import { Producto } from "src/productos/entities/producto.entity";
+import { Tienda } from "src/tiendas/entities/tienda.entity";
 import { Entity,PrimaryGeneratedColumn,Column, OneToMany } from "typeorm";
 @Entity('comercios')
 export class Comercio {
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column()
+    @Column({name:'nombreUsuario'})
     nombreUsuario:string;
 
-    @Column()
+    @Column({name:'contrasena'})
     contrasena:string;
 
     @Column()
@@ -16,7 +17,9 @@ export class Comercio {
 
     @Column({default:true})
     isActive:boolean;
+   
+    @OneToMany(() => Tienda, (tienda) => tienda.comercio)
+tiendas: Tienda[];
 
-    @OneToMany(() => Producto, (producto) => producto.comercio)
-productos: Producto[];
+
 }

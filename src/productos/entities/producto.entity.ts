@@ -25,8 +25,7 @@ export class Producto {
     tienda: Tienda;
 
 
-    @ManyToOne(() => Comercio, (comercio) => comercio.productos)
-    comercio: Comercio;
+  
 
     @Column()
     comercioId: number; // El campo físico en la tabla
