@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsNotEmpty, MinLength, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateComercioDto {
     @IsString()
@@ -13,4 +14,9 @@ export class CreateComercioDto {
     @IsString()
     @IsNotEmpty()
     nombreLocal: string;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number) // Asegura que el valor se transforme a número
+    tiendaId:number;
 }

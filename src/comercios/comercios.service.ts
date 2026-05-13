@@ -5,13 +5,16 @@ import { Comercio } from './entities/comercio.entity'; // Tu entidad
 import { CreateComercioDto } from './dto/create-comercio.dto';
 import { UpdateComercioDto } from './dto/update-comercio.dto';
 import * as bcrypt from 'bcrypt';
+import { Tienda } from 'src/tiendas/entities/tienda.entity';
 
 @Injectable()
 export class ComerciosService {
   constructor(
     @InjectRepository(Comercio)
     private readonly comercioRepository: Repository<Comercio>, // Inyección del repositorio
-  ) {}
+    @InjectRepository(Tienda) // <--- AGREGÁ ESTO
+    private tiendaRepository: Repository<Tienda>,
+  ) { }
 
   async create(createComercioDto: CreateComercioDto) {
     // 1. Encriptamos la contraseña antes de guardar
@@ -21,21 +24,23 @@ export class ComerciosService {
     // 2. Creamos el objeto con la contraseña hasheada
     const nuevoComercio = this.comercioRepository.create({
       ...createComercioDto,
+      id: createComercioDto.tiendaId, // Asignamos el ID de la tienda al comercio
       contrasena: hashPassword,
     });
 
     // 3. Guardamos en la DB
-    return await this.comercioRepository.save(nuevoComercio);
+    const comercioGuardado = await this.comercioRepository.save(nuevoComercio);
+    return comercioGuardado;
   }
 
- async findOneByNombreUsuario(nombreUsuario: string) {
-  // Forzamos la búsqueda ignorando cualquier otro estado
-  const comercio = await this.comercioRepository.findOne({ 
-    where: { nombreUsuario: nombreUsuario.trim() } 
-  });
-  console.log('Resultado de DB:', comercio ? 'Encontrado' : 'No encontrado');
-  return comercio;
-}
+  async findOneByNombreUsuario(nombreUsuario: string) {
+    // Forzamos la búsqueda ignorando cualquier otro estado
+    const comercio = await this.comercioRepository.findOne({
+      where: { nombreUsuario: nombreUsuario.trim() }
+    });
+    console.log('Resultado de DB:', comercio ? 'Encontrado' : 'No encontrado');
+    return comercio;
+  }
 
   findAll() {
     return this.comercioRepository.find();
