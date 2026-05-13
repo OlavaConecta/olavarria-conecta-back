@@ -17,9 +17,6 @@ export class Comercio {
 
     @Column({default:true})
     isActive:boolean;
-
-    @Column ({nullable:true})
-    usuarioId:number;
    
     @OneToMany(() => Tienda, (tienda) => tienda.comercio)
 tiendas: Tienda[];
