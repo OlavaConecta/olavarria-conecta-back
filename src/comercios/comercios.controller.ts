@@ -31,18 +31,8 @@ export class ComerciosController {
 async update(
   @Param('id') id: string, 
   @Body() updateComercioDto: UpdateComercioDto,
-
 ) {
-  // 🔍 Agregá este log para ver exactamente cómo NestJS recibe al usuario del token
-  console.log('Usuario que intenta editar:', req.user);
-
-  // Asegurate de mapear bien la propiedad (puede ser id, userId o sub)
-  const usuarioId = req.user?.userId || req.user?.id || req.user?.sub;
-
-  if (usuarioId !== +id) {
-    throw new UnauthorizedException('No tienes permiso para modificar este comercio');
-  }
-
+  // Versión vieja: actualiza directo el comercio o producto sin chequear req.user
   return this.comerciosService.update(+id, updateComercioDto);
 }
 
