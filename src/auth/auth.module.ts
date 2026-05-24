@@ -12,6 +12,6 @@ import { JwtStrategy } from './jwt.strategy';
   ], // Importante para que Auth pueda usar AdminService
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController], 
-  exports: [AuthService, PassportModule, JwtModule]
+
 })
 export class AuthModule { }
