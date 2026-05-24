@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query,UseInterceptors, UploadedFile, BadRequestException, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query,UseInterceptors, UploadedFile, BadRequestException, Put, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('productos')
 export class ProductosController {
@@ -44,16 +45,32 @@ async create(
     return this.productosService.update(+id, updateProductoDto, file);
   }
   
-  // ESTA ES LA RUTA PARA EL DASHBOARD DE LOS COMERCIOS
+  @UseGuards(AuthGuard('jwt')) // 🔒 Frena a cualquiera que no tenga el token (incógnito, extraños, etc.)
   @Patch('dashboard/:id')
-updateParcial(
-  @Param('id') id: string, 
-  @Body() updateProductoDto: UpdateProductoDto
-) {
-  // Usamos "as any" o simplemente no pasamos el tercer parámetro
-  // para que TypeScript no se queje de que falta el "File"
-  return this.productosService.update(+id, updateProductoDto, undefined as any);
-}
+  async updateParcial(
+    @Param('id') id: string, 
+    @Body() updateProductoDto: UpdateProductoDto,
+    @Req() req: any // 👈 Traemos la request para saber quién es el usuario logueado
+  ) {
+    // 1. Buscamos el producto primero para saber a qué comercio le pertenece
+    const producto = await this.productosService.findOne(+id);
+    
+    if (!producto) {
+      throw new UnauthorizedException('El producto que intentas editar no existe');
+    }
+
+    // 2. Extraemos el ID del comercio desde el Token seguro (JwtStrategy)
+    const comercioLogueadoId = req.user?.userId || req.user?.id || req.user?.sub;
+
+    // 3. Control de seguridad: ¿El producto pertenece al comercio que está logueado?
+    // (Ajustá "producto.comercioId" según cómo se llame la columna de relación en tu entidad Producto)
+    if (producto.comercioId !== comercioLogueadoId) {
+      throw new UnauthorizedException('No tienes permisos para modificar productos de otro comercio');
+    }
+
+    // 4. Si pasó el control, guardamos en la DB
+    return this.productosService.update(+id, updateProductoDto, undefined as any);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
