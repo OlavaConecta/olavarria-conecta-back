@@ -26,12 +26,12 @@ export class ComerciosController {
     return this.comerciosService.findOne(+id);
   }
 
-@UseGuards(AuthGuard('jwt')) 
+
 @Patch(':id')
 async update(
   @Param('id') id: string, 
   @Body() updateComercioDto: UpdateComercioDto,
-  @Req() req: any 
+
 ) {
   // 🔍 Agregá este log para ver exactamente cómo NestJS recibe al usuario del token
   console.log('Usuario que intenta editar:', req.user);
