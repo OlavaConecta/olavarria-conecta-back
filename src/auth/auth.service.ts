@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+  jwtService: any;
   constructor(
     private readonly adminService: AdminService,
     private readonly comerciosService: ComerciosService
@@ -53,5 +54,26 @@ export class AuthService {
     // 3. Devolvemos el comercio sin la pass
     const { contrasena: _, ...result } = comercio;
     return result;
+  
   }
+  async loginComercio(nombreUsuario: string, contrasena: string) {
+    // Primero corre tu validación de arriba para verificar que la contraseña sea correcta
+    const comercioValido = await this.validateComercio(nombreUsuario, contrasena);
+
+    // Si pasó la validación, armamos el Payload (los datos que van ocultos dentro del token)
+    const payload = { 
+      sub: comercioValido.id, 
+      username: comercioValido.nombreUsuario 
+    };
+
+    // Devolvemos los datos que React necesita + el maldito Token firmado
+    return {
+      id: comercioValido.id,
+      nombreUsuario: comercioValido.nombreUsuario,
+      nombreLocal: comercioValido.nombreLocal,
+      isActive: comercioValido.isActive,
+      // Generamos el string JWT en base al payload y la secret del AuthModule
+      token: this.jwtService.sign(payload), 
+    };}
+  
 }
