@@ -1,6 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AdminService } from '../admin/admin.service';
 import { ComerciosService } from 'src/comercios/comercios.service';
+import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -8,8 +9,7 @@ export class AuthService {
   jwtService: any;
   constructor(
     private readonly adminService: AdminService,
-    private readonly comerciosService: ComerciosService
-  ) {}
+    private readonly comerciosService: ComerciosService  ) {}
 
   async validateUser(email: string, contrasena: string): Promise<any> {
     console.log('datos que llegan del front', email, contrasena);
