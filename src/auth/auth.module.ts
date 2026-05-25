@@ -10,7 +10,7 @@ import { JwtStrategy } from './jwt.strategy';
 @Module({
   imports: [AdminModule, ComerciosModule,
   ], // Importante para que Auth pueda usar AdminService
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService],
   controllers: [AuthController], 
 
 })
