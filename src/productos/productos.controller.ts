@@ -45,30 +45,13 @@ async create(
     return this.productosService.update(+id, updateProductoDto, file);
   }
   
-  @UseGuards(AuthGuard('jwt')) // 🔒 Frena a cualquiera que no tenga el token (incógnito, extraños, etc.)
-  @Patch('dashboard/:id')
+  
+  @Patch('dashboard/:id') // (O la ruta que uses para este método)
   async updateParcial(
     @Param('id') id: string, 
     @Body() updateProductoDto: UpdateProductoDto,
-    @Req() req: any // 👈 Traemos la request para saber quién es el usuario logueado
   ) {
-    // 1. Buscamos el producto primero para saber a qué comercio le pertenece
-    const producto = await this.productosService.findOne(+id);
-    
-    if (!producto) {
-      throw new UnauthorizedException('El producto que intentas editar no existe');
-    }
-
-    // 2. Extraemos el ID del comercio desde el Token seguro (JwtStrategy)
-    const comercioLogueadoId = req.user?.userId || req.user?.id || req.user?.sub;
-
-    // 3. Control de seguridad: ¿El producto pertenece al comercio que está logueado?
-    // (Ajustá "producto.comercioId" según cómo se llame la columna de relación en tu entidad Producto)
-    if (producto.comercioId !== comercioLogueadoId) {
-      throw new UnauthorizedException('No tienes permisos para modificar productos de otro comercio');
-    }
-
-    // 4. Si pasó el control, guardamos en la DB
+    // Código viejo: Actualiza directo en la base de datos sin restricciones de tokens
     return this.productosService.update(+id, updateProductoDto, undefined as any);
   }
 
