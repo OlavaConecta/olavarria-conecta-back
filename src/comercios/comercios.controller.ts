@@ -17,6 +17,8 @@ export class ComerciosController {
   findAll() {
     return this.comerciosService.findAll();
   }
+
+  //Get de comercio por nombre de usuario
   @Get('nombre/:nombreUsuario')
   async findOneByNombre(@Param('nombreUsuario') nombreUsuario: string) {
     return this.comerciosService.findOneByNombreUsuario(nombreUsuario);
@@ -32,7 +34,7 @@ async update(
   @Param('id') id: string, 
   @Body() updateComercioDto: UpdateComercioDto,
 ) {
-  // Versión vieja: actualiza directo el comercio o producto sin chequear req.user
+
   return this.comerciosService.update(+id, updateComercioDto);
 }
 

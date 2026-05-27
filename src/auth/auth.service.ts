@@ -2,13 +2,29 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AdminService } from '../admin/admin.service';
 import { ComerciosService } from 'src/comercios/comercios.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly adminService: AdminService,
-    private readonly comerciosService: ComerciosService
+    private readonly comerciosService: ComerciosService,
+    private readonly jwtService: JwtService
   ) {}
+  async login(user: any, type: 'admin' | 'comercio') {
+    const payload = { 
+      sub: user.id, 
+      email: user.email || user.nombreUsuario, 
+      role: type 
+    };
+    
+    return {
+      id: user.id,
+      email: user.email || user.nombreUsuario,
+      role: type,
+      access_token: this.jwtService.sign(payload), // <--- ¡Acá se genera el token!
+    };
+  }
 
   async validateUser(email: string, contrasena: string): Promise<any> {
     console.log('datos que llegan del front', email, contrasena);

@@ -7,10 +7,17 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 
+
 @Module({
   imports: [AdminModule, ComerciosModule,
-  ], // Importante para que Auth pueda usar AdminService
-  providers: [AuthService],
+    PassportModule,
+    JwtModule.register({
+      secret: 'OLAVARRIA_CONECTA_2026', // Cambiala por una frase segura
+      signOptions: { expiresIn: '8h' }, // El token dura un día enteros
+    }),
+  ],
+   // Importante para que Auth pueda usar AdminService
+  providers: [AuthService, JwtStrategy], // Registramos la estrategia JWT
   controllers: [AuthController], 
 
 })

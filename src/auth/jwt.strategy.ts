@@ -6,15 +6,15 @@ import { Injectable } from '@nestjs/common';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      // Agarra el token que viaja en los headers
+      // Le indica a NestJS que extraiga el token del header 'Authorization: Bearer <TOKEN>'
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'Olavarria_Conecta_2026', // Poné la misma que en el módulo
+      secretOrKey: 'OLAVARRIA_CONECTA_2026', // Debe ser la misma clave del AuthModule
     });
   }
 
   async validate(payload: any) {
-    // Esto es lo que se va a meter adentro de req.user
-    return { userId: payload.sub, username: payload.username, role: payload.role };
+    // Los datos que devuelvas acá se inyectan en las peticiones como 'req.user'
+    return { userId: payload.sub, email: payload.email, role: payload.role };
   }
 }
