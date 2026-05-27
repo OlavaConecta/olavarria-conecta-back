@@ -44,7 +44,7 @@ export class TiendasController {
       throw error;
     }
   }
-  @UseGuards(JwtAuthGuard)
+
   @Get()
   findAll() {
     return this.tiendasService.findAll();
