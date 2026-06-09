@@ -12,6 +12,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { MailModule } from './mail/mail.module';
 import { ComerciosModule } from './comercios/comercios.module';
+import { FarmaciasModule } from './farmacias/farmacias.module';
 
 
 @Module({
@@ -46,6 +47,7 @@ import { ComerciosModule } from './comercios/comercios.module';
   CloudinaryModule,
   MailModule,
   ComerciosModule,
+  FarmaciasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
