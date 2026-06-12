@@ -9,5 +9,6 @@ import {FarmaciaTurno} from "./entities/farmacia-turno.entity";
   imports: [TypeOrmModule.forFeature([Farmacia, FarmaciaTurno])],
   controllers: [FarmaciasController],
   providers: [FarmaciasService],
+  exports:[FarmaciasService]
 })
 export class FarmaciasModule {}

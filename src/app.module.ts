@@ -13,6 +13,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { MailModule } from './mail/mail.module';
 import { ComerciosModule } from './comercios/comercios.module';
 import { FarmaciasModule } from './farmacias/farmacias.module';
+import { SeoModule } from './seo/seo.module';
 
 
 @Module({
@@ -48,7 +49,7 @@ import { FarmaciasModule } from './farmacias/farmacias.module';
   MailModule,
   ComerciosModule,
   FarmaciasModule,
-  ],
+  SeoModule],
   controllers: [AppController],
   providers: [AppService],
 })
