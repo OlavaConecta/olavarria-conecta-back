@@ -1,5 +1,6 @@
 import { Categoria } from 'src/categorias/entities/categoria.entity';
 import { Comercio } from 'src/comercios/entities/comercio.entity';
+import { Pedido } from 'src/pedidos/entities/pedido.entity';
 import { Planes } from 'src/planes/entities/plane.entity';
 import { Producto } from 'src/productos/entities/producto.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -49,6 +50,9 @@ export class Tienda {
     @ManyToOne(() => Comercio, (comercio) => comercio.tiendas)
 @JoinColumn({ name: 'comercioId' }) // Esto coincide con tu captura de Workbench
 comercio: Comercio;
+
+@OneToMany(()=> Pedido, (pedido)=>pedido.tienda)
+pedidos:Pedido[]
 }
 
 //falta los one to many con productos y categorias

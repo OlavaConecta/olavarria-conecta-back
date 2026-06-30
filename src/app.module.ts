@@ -14,6 +14,7 @@ import { MailModule } from './mail/mail.module';
 import { ComerciosModule } from './comercios/comercios.module';
 import { FarmaciasModule } from './farmacias/farmacias.module';
 import { SeoModule } from './seo/seo.module';
+import { PedidosModule } from './pedidos/pedidos.module';
 
 
 @Module({
@@ -49,7 +50,8 @@ import { SeoModule } from './seo/seo.module';
   MailModule,
   ComerciosModule,
   FarmaciasModule,
-  SeoModule],
+  SeoModule,
+  PedidosModule],
   controllers: [AppController],
   providers: [AppService],
 })
