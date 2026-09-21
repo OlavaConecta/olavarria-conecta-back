@@ -5,13 +5,16 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 export class Planes {
 
     @PrimaryGeneratedColumn()
-    id:number;
+    id: number;
 
     @Column()
-    descripcion:string;
+    descripcion: string;
 
     @Column('decimal')
-    precio:number;
+    precio: number;
+
+    @Column({ type: 'int', nullable: true, default: 10 })
+    limiteProductos: number;
 
     @Column({ default: false })
     isMostPop: boolean;
@@ -19,7 +22,7 @@ export class Planes {
     @Column("simple-array", { nullable: true })
     beneficios: string[];
 
-    @OneToMany(()=>Tienda,(tienda)=>tienda.plan)
-    tiendas:Tienda[];
+    @OneToMany(() => Tienda, (tienda) => tienda.plan)
+    tiendas: Tienda[];
 
 }

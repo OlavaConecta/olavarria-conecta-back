@@ -9,8 +9,14 @@ export class ComerciosController {
   constructor(private readonly comerciosService: ComerciosService) { }
 
   @Post()
-  create(@Body() createComercioDto: CreateComercioDto) {
-    return this.comerciosService.create(createComercioDto);
+  async create(@Body() createComercioDto: CreateComercioDto) {
+    const comercioGuardado = await this.comerciosService.create(createComercioDto);
+    
+    return {
+      ok: true,
+      comercio: comercioGuardado,
+      necesitaOnboarding: true, // Esto le avisa al frontend que debe redirigir
+    };
   }
 
   @Get()

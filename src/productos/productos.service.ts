@@ -1,10 +1,11 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './entities/producto.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Tienda } from 'src/tiendas/entities/tienda.entity';
 
 @Injectable()
 export class ProductosService {
@@ -12,10 +13,52 @@ export class ProductosService {
   constructor(
     @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>,
-    private readonly cloudinaryService: CloudinaryService
+    private readonly cloudinaryService: CloudinaryService,
+    @InjectRepository(Tienda)
+    private readonly tiendaRepository: Repository<Tienda>
   ) { }
   async create(createProductoDto: any, file: Express.Multer.File): Promise<Producto> {
   try {
+const tiendaId = Number(createProductoDto.tiendaId);
+
+      // 1. Buscamos la tienda y sus relaciones de plan y productos.
+      const tienda = await this.tiendaRepository.findOne({
+        where: { id: tiendaId },
+        relations: ['plan', 'productos']
+      });
+
+      if (!tienda) {
+        throw new NotFoundException('No se encontró la tienda especificada.');
+      }
+
+      
+  
+
+      // Se Valida el límite de productos según el ID del plan
+      const planId = tienda.plan?.id ?? 1; // Si no tiene plan, asumimos ID 1 (Básico)
+      let limitePermitido = 10; // Por defecto Plan Básico
+
+      if (planId === 1) {
+        limitePermitido = 10; // Plan Básico: hasta 10 productos
+      } else if (planId === 2) {
+        limitePermitido = 25; // Plan Estándar: hasta 25 productos
+      } else if (planId === 3) {
+        limitePermitido = -1; // Plan Premium: Ilimitado
+      }
+
+      // 3. Si el plan no es ilimitado (-1), validamos la cantidad actual
+      if (limitePermitido !== -1) {
+        const cantidadActual = tienda.productos ? tienda.productos.length : await this.productoRepository.count({ where: { tienda: { id: tiendaId } } });
+
+        if (cantidadActual >= limitePermitido) {
+          throw new BadRequestException(
+            `Has alcanzado el límite de ${limitePermitido} productos permitidos para tu plan actual. Actualiza tu plan para continuar cargando productos.`
+          );
+        }
+      }
+
+      
+      //URL DE CLOUDINARY DE LAS IMG
     let urlImagen = "";
 
     if (file) {

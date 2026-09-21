@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, UseGuards, Req } from '@nestjs/common';
 import { TiendasService } from './tiendas.service';
 import { CreateTiendaDto } from './dto/create-tienda.dto';
 import { UpdateTiendaDto } from './dto/update-tienda.dto';
@@ -11,39 +11,42 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class TiendasController {
   constructor(private readonly tiendasService: TiendasService, private readonly cloudinaryService: CloudinaryService) { }
 
-  @Post()
-  @UseInterceptors(FileInterceptor('imagen_archivo'))
+@UseGuards(JwtAuthGuard) // 1. Protegemos la ruta para que exija estar logueado
+@Post()
+@UseInterceptors(FileInterceptor('imagen_archivo'))
+async create(
+  @UploadedFile() file: Express.Multer.File,
+  @Body() createDto: CreateTiendaDto,
+  @Req() req: any // 2. Capturamos la request para obtener los datos del token JWT
+) {
+  try {
+    if (!file) throw new BadRequestException('Falta la imagen');
 
-  async create(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createDto: CreateTiendaDto
-  ) {
-    try {
-      if (!file) throw new BadRequestException('Falta la imagen');
+    // El token JWT nos suele devolver el id o sub del usuario logueado. 
+    // (Asegúrate de que en tu estrategia JWT guardes el ID del comercio en req.user.id o req.user.userId)
+    const comercioId = req.user.id || req.user.userId; 
 
-      // 1. Subir a Cloudinary
-      const imageUrl = await this.cloudinaryService.uploadFile(file);
-      console.log('URL de imagen generada:', imageUrl);
+    // 1. Subir a Cloudinary
+    const imageUrl = await this.cloudinaryService.uploadFile(file);
 
-      // 2. Construir objeto para la DB
-      const datosParaGuardar = {
-        ...createDto,
-        planId: Number(createDto.planId), // Forzamos número por si llega string
-        imagen: imageUrl,
-        imagenUrl: imageUrl,
-      };
+    // 2. Construir objeto para la DB inyectando el comercioId del usuario logueado
+    const datosParaGuardar = {
+      ...createDto,
+      
+      imagen: imageUrl,
+      imagenUrl: imageUrl,
+      comercioId: comercioId, // <--- 3. Asociamos la tienda automáticamente al comercio autenticado
+      activo: true, // Opcional: por defecto activa o en revisión
+    };
 
-      console.log('Intentando guardar en DB:', datosParaGuardar);
+    // 3. Guardar
+    return await this.tiendasService.save(datosParaGuardar);
 
-      // 3. Guardar
-      return await this.tiendasService.save(datosParaGuardar);
-
-    } catch (error: any) {
-      // ESTO VA A APARECER EN LOS LOGS DE RAILWAY
-      console.error('ERROR CRÍTICO EN CREATE:', error.message);
-      throw error;
-    }
+  } catch (error: any) {
+    console.error('ERROR CRÍTICO EN CREATE:', error.message);
+    throw error;
   }
+}
 
   @Get()
   findAll() {
@@ -62,6 +65,7 @@ export class TiendasController {
     @Body() updateTiendaDto: UpdateTiendaDto,
     @UploadedFile() file: Express.Multer.File // 2. Capturamos el archivo si viene
   ): Promise<Tienda> {
+    const realId = id.split('-')[0];
 
     let imageUrl: string | undefined = undefined; // Usamos undefined para que el service sepa si hubo cambio o no
 
@@ -72,9 +76,38 @@ export class TiendasController {
     }
 
     // 4. Ahora le pasamos el tercer parámetro al Service
-    return this.tiendasService.update(+id, updateTiendaDto, imageUrl);
+    return this.tiendasService.update(+realId , updateTiendaDto, imageUrl);//verificar si ese pdatetiendadto esta trayendo los datos 
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('onboarding/mi-tienda')
+  @UseInterceptors(FileInterceptor('imagen_archivo'))
+  async actualizarTiendaOnboarding(
+    @Req() req: any,
+    @Body() updateTiendaDto: UpdateTiendaDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const comercioId = req.user.id || req.user.userId;
+    
+    let imageUrl: string | undefined = undefined;
+    if (file) {
+      imageUrl = await this.cloudinaryService.uploadFile(file);
+    }
+
+    return await this.tiendasService.actualizarTiendaPorComercio(comercioId, updateTiendaDto, imageUrl);
+  }
+
+  //Metodo para actualizar el plan de una tienda.
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/plan')
+async actualizarPlan(
+  @Param('id') tiendaId: number,
+  @Body('planId') planId: number,
+) {
+  return this.tiendasService.actualizarPlan(Number(tiendaId), Number(planId));
+}
+  
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.tiendasService.remove(id);

@@ -11,12 +11,13 @@ export class CreateComercioDto {
     @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
     contrasena: string;
 
-    @IsString()
-    @IsNotEmpty()
-    nombreLocal: string;
-
     @IsNumber()
     @IsOptional()
     @Type(() => Number) // Asegura que el valor se transforme a número
-    tiendaId:number;
+    tiendaId?:number;
+
+    
+    @IsString() // <--- Agregas esto al DTO del comercio para que la reciba del front
+    @IsOptional() 
+    categoria?: string;
 }

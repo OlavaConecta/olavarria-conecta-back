@@ -15,19 +15,19 @@ export class Tienda {
     @Column()
     nombre: string;
 
-    @Column()
+    @Column({ nullable: true })
     whatsapp: string;
 
-    @Column()
+    @Column({ nullable: true })
     direccion: string;
 
-    @Column()
+    @Column({ nullable: true })
     horario: string;
 
-    @Column()
+    @Column({ nullable: true })
     imagen: string;
 
-    @Column()
+    @Column({ nullable: true })
     activo: boolean;
     
     @Column({ name: 'categoria', type: 'varchar', nullable: true }) // Esto lee el texto "Mascotas", "Peluquería", etc.

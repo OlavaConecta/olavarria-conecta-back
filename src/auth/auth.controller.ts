@@ -17,4 +17,9 @@ export class AuthController {
     const comercio = await this.authService.validateComercio(body.nombreUsuario, body.contrasena);
     return this.authService.login(comercio, 'comercio');
   }
+  // --- NUEVO: REGISTRO PÚBLICO PARA COMERCIOS ---
+  @Post('registro-comercio')
+  async registrarComercio(@Body() body: { nombreUsuario: string; contrasena: string; nombreLocal: string }) {
+    return this.authService.registrarComercio(body);
+  }
 }

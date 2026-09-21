@@ -7,10 +7,11 @@ import { Categoria } from 'src/categorias/entities/categoria.entity';
 import { Producto } from 'src/productos/entities/producto.entity';
 import { Planes } from 'src/planes/entities/plane.entity';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { Comercio } from 'src/comercios/entities/comercio.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Tienda,Categoria, Producto, Planes]),
+    TypeOrmModule.forFeature([Tienda,Categoria, Producto, Planes,Comercio]),
     CloudinaryModule,
     // forwardRef(() => ProductosModule),
   ],
