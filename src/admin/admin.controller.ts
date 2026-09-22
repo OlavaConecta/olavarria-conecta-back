@@ -23,16 +23,24 @@ export class AdminController {
     if (isNaN(numericId)) {
       throw new BadRequestException('El ID proporcionado no es válido');
     }
-    return this.adminService.findOne(+id);
+    return this.adminService.findOne(numericId);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
+    const numericId = Number(id);
+    if (isNaN(numericId)) {
+      throw new BadRequestException('El ID proporcionado no es válido');
+    }
+    return this.adminService.update(numericId, updateAdminDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
+    const numericId = Number(id);
+    if (isNaN(numericId)) {
+      throw new BadRequestException('El ID proporcionado no es válido');
+    }
+    return this.adminService.remove(numericId);
   }
 }
