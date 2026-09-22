@@ -4,6 +4,7 @@ import { json, urlencoded } from 'express';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 
 async function bootstrap() {
   const app = await NestFactory.create <NestExpressApplication>(AppModule);
@@ -24,6 +25,18 @@ app.useGlobalPipes(new ValidationPipe({
   }));
 app.use(json({ limit: '50mb' })); 
   app.use(urlencoded({ limit: '50mb', extended: true }));
+
+//esto sirve para las migraciones de base de datos
+try {
+    const dataSource = app.get(DataSource);
+    await dataSource.runMigrations();
+    console.log('🚀 Migraciones ejecutadas con éxito en producción');
+  } catch (error) {
+    console.error('❌ Error al ejecutar las migraciones automáticamente:', error);
+  }
+
+
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
