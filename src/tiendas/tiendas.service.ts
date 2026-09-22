@@ -95,6 +95,11 @@ export class TiendasService {
 
     const { planId, categoria, ...datosSimples } = updateTiendaDto;
     Object.assign(tienda, datosSimples);
+    if (categoria !== undefined) {
+  tienda.categoria = categoria;
+
+
+}
 
     // --- LÓGICA DE BORRADO OPCIÓN A ---
     if (imagenUrl && tienda.imagen) {
